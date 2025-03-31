@@ -483,7 +483,7 @@ typedef struct
 #define BAND_ALL 19
 
 Band band[] = {
-    {"VHF", FM_BAND_TYPE, 6400, 10800, 10390, 1, 0},
+    {"VHF", FM_BAND_TYPE, 8750, 10800, 10660, 1, 0},
     {"MW1", MW_BAND_TYPE, 150, 1720, 810, 3, 4},
     {"MW2", MW_BAND_TYPE, 531, 1701, 783, 2, 4},
     {"MW3", MW_BAND_TYPE, 1700, 3500, 2500, 1, 4},
