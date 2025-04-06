@@ -2236,8 +2236,7 @@ spr.fillRect(meter_offset_x + margin, meter_offset_y + margin, fillWidth, innerH
 // 2. Affichage des graduations et des étiquettes
 //-----------------------------------------------------
 
-// Utilisation d'une police réduite pour afficher les graduations
-spr.setFreeFont(&PixelOperator6pt7b);
+
 
 // Valeurs des graduations à afficher (pour S0 à S9+60)
 // Pour les valeurs inférieures à 10, on affiche le chiffre seul, pour les autres, on ajoute un "+"
@@ -2273,7 +2272,7 @@ for (int i = 0; i < numGrad; i++) {
   // Position verticale du texte (au-dessus du tick)
   int labelY = tickY_start - 8;  // Ajustez selon la hauteur de la police utilisée
   
-  spr.drawString(gradLabel, labelX, labelY, currentColor);
+  spr.drawString(gradLabel, labelX, labelY, currentColor, 2);
 }
 
 //-----------------------------------------------------
