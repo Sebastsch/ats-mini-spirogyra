@@ -11,6 +11,7 @@
 #include "poxel_font16pt7b.h"      //Font1 Band
 #include "Technology10pt7b.h"       //Font2 RDS Station
 #include "PixelOperator8p.h"      //Font3 RDS Message
+#include <FreeSans9pt7b.h>  
 
 
 // =================================
@@ -2198,13 +2199,12 @@ void drawSprite()
 
 
 
-
 // Dimensions du cadre complet
 const int frameW  = 100;
 const int frameH  = 15;
 const int margin  = 1;                   // Marge pour le cadre interne (pour ne pas écraser les bords)
-const int innerW  = frameW - 2 * margin;  // Zone d'affichage interne en largeur (ici 98)
-const int innerH  = frameH - 2 * margin;  // Zone d'affichage interne en hauteur (ici 13)
+const int innerW  = frameW - 2 * margin;  // Zone d'affichage interne en largeur (98 pixels)
+const int innerH  = frameH - 2 * margin;  // Zone d'affichage interne en hauteur (13 pixels)
 
 // Récupération et bornage du signal (entre 0 et 60 dB)
 // Conversion linéaire : dB = (getStrength() - 1) * (60.0 / 16.0)
@@ -2217,26 +2217,27 @@ int fillWidth = (int)((signal_dB / 60.0) * innerW);
 
 // Définition des couleurs pour le texte : la couleur "normale" et sa version inversée
 uint16_t normalTextColor  = theme[themeIdx].smeter_icon;
-uint16_t invertedTextColor = normalTextColor ^ 0xFFFF; // inversion simple
+uint16_t invertedTextColor = normalTextColor ^ 0xFFFF; // inversion simple par XOR
 
 //-----------------------------------------------------
-// 1. Dessin du cadre et du remplissage (bargraph)
+// 1. Cadre et remplissage (bargraph)
 //-----------------------------------------------------
 
-// Effacer le cadre en remplissant la zone de fond
+// Effacer la zone en remplissant le fond du cadre
 spr.fillRect(meter_offset_x, meter_offset_y, frameW, frameH, theme[themeIdx].bg);
 
 // Dessiner le contour du cadre de 100×15 pixels
 spr.drawRect(meter_offset_x, meter_offset_y, frameW, frameH, theme[themeIdx].smeter_icon);
 
-// Remplir la zone intérieure (à l'intérieur du cadre) jusqu'au niveau du signal
+// Remplir la zone intérieure (bargraph) jusqu'au niveau du signal
 spr.fillRect(meter_offset_x + margin, meter_offset_y + margin, fillWidth, innerH, theme[themeIdx].smeter_bar);
 
 //-----------------------------------------------------
-// 2. Affichage des graduations et des étiquettes
+// 2. Affichage des graduations et des libellés
 //-----------------------------------------------------
 
-
+// Utilisation de la police "FreeSans9pt7b" (provenant de TFT_eSPI) pour les graduations
+spr.setFreeFont(&FreeSans9pt7b);
 
 // Valeurs des graduations à afficher (pour S0 à S9+60)
 // Pour les valeurs inférieures à 10, on affiche le chiffre seul, pour les autres, on ajoute un "+"
@@ -2244,61 +2245,55 @@ int gradValues[9] = {1, 3, 5, 7, 9, 10, 20, 40, 60};
 const int numGrad = 9;
 
 // Position verticale pour les ticks de graduation
-int tickY_start = meter_offset_y + frameH - margin - 4;  // par exemple, 4 pixels de hauteur pour le tick
-int tickY_end   = tickY_start + 3;
+int tickY_start = meter_offset_y + frameH - margin - 4;  // par exemple, 4 pixels pour le tick
+int tickY_end   = tickY_start + 3;  // hauteur du tick
 
 for (int i = 0; i < numGrad; i++) {
   int val = gradValues[i];
-  // Calcul de la position X, en se basant sur la proportion (val/60) sur la largeur interne
+  // Calcul de la position X dans la zone interne : proportion (val/60) appliquée sur innerW
   int gradX = meter_offset_x + margin + (int)((val / 60.0) * innerW);
   
-  // Choix de la couleur : si la position du tick est dans la zone remplie, inversion de la couleur
+  // Si la graduation se trouve dans la zone remplie, on inverse sa couleur
   uint16_t currentColor = (gradX < (meter_offset_x + margin + fillWidth)) ? invertedTextColor : normalTextColor;
   
-  // Dessiner le tick vertical sur la ligne graduée
+  // Dessin du tick vertical sur la ligne graduée
   spr.drawLine(gradX, tickY_start, gradX, tickY_end, currentColor);
   
-  // Préparer le libellé de graduation (affichage direct pour val < 10, sinon avec "+")
+  // Préparation du label de graduation : pour val < 10 affichage direct, sinon ajout d'un "+"
   char gradLabel[6];
   if (val < 10)
     sprintf(gradLabel, "%d", val);
   else
     sprintf(gradLabel, "+%d", val);
   
-  // Calculer la largeur du texte pour le centrer précisément sur le tick
+  // Calcule de la largeur du texte pour le centrer sur le tick
   int labelWidth = spr.textWidth(gradLabel);
   int labelX = gradX - labelWidth / 2;
   
-  // Position verticale du texte (au-dessus du tick)
-  int labelY = tickY_start - 8;  // Ajustez selon la hauteur de la police utilisée
-  
-  spr.drawString(gradLabel, labelX, labelY, currentColor, 2);
+  // Position verticale du texte (au-dessus des ticks)
+  int labelY = tickY_start - 8;  // ajuster selon la police utilisée
+  spr.drawString(gradLabel, labelX, labelY, currentColor);
 }
 
 //-----------------------------------------------------
 // 3. Affichage de la valeur numérique du signal
 //-----------------------------------------------------
 
-// Préparer la chaîne avec la valeur du signal (par exemple, "45 dB")
+// Préparer la chaîne contenant la valeur (exemple : "45 dB")
 char signalText[10];
 sprintf(signalText, "%.0f dB", signal_dB);
 int signalTextWidth = spr.textWidth(signalText);
 
 // Centrer le texte horizontalement dans le cadre
 int signalTextX = meter_offset_x + (frameW - signalTextWidth) / 2;
-// Position verticale ajustée (par exemple, en haut du cadre)
+// Position verticale (par exemple, en haut du cadre)
 int signalTextY = meter_offset_y + 2;
 
-// Déterminer la couleur du texte en se basant sur sa position centrale
+// Déterminer si le centre du texte se trouve dans la zone remplie afin d'inverser la couleur si besoin
 int centerX = signalTextX + signalTextWidth / 2;
 uint16_t textColor = (centerX < (meter_offset_x + margin + fillWidth)) ? invertedTextColor : normalTextColor;
 
-// Afficher la valeur numérique dans le cadre
-spr.drawString(signalText, signalTextX, signalTextY, textColor,2);
-
-
-
-
+spr.drawString(signalText, signalTextX, signalTextY, textColor);
 
 
 
