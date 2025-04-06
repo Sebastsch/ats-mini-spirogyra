@@ -2228,7 +2228,57 @@ void drawSprite()
       spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
     }
 
+if (currentMode == FM) {
+  // Configuration de l'affichage
+  spr.setTextDatum(TL_DATUM);
+  spr.setFreeFont(&PixelOperator8pt7b);
+  spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
 
+  const int max_line_len = 30; // Nombre maximum de caractères par ligne
+  char line1[max_line_len + 1];
+  char line2[max_line_len + 1];
+
+  int len = strlen(bufferRdsMsg);
+
+  // Si le message tient sur une seule ligne, pas de découpage nécessaire
+  if (len <= max_line_len) {
+    strncpy(line1, bufferRdsMsg, max_line_len);
+    line1[len] = '\0';
+    line2[0] = '\0';
+  } else {
+    // Chercher le dernier espace dans la portion de texte destinée à la première ligne
+    int breakIndex = max_line_len;
+    while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
+      breakIndex--;
+    }
+    
+    // Si aucun espace n'est trouvé, on garde la coupure fixe
+    if (breakIndex == 0) {
+      breakIndex = max_line_len;
+    }
+    
+    // Copie de la première ligne jusqu'au point de découpe
+    strncpy(line1, bufferRdsMsg, breakIndex);
+    line1[breakIndex] = '\0';
+    
+    // Sauter les espaces en début de la seconde ligne
+    int startSecondLine = breakIndex;
+    while (bufferRdsMsg[startSecondLine] == ' ' && startSecondLine < len) {
+      startSecondLine++;
+    }
+    
+    // Copier le reste pour la deuxième ligne, avec une limite
+    strncpy(line2, bufferRdsMsg + startSecondLine, max_line_len);
+    line2[max_line_len] = '\0';
+  }
+
+  // Affichage des lignes
+  spr.drawString(line1, rdsmess_offset_x, rdsmess_offset_y);
+  if (strlen(line2) > 0) {
+    int lineSpacing = 13; // Ajustez en fonction de la hauteur de la police
+    spr.drawString(line2, rdsmess_offset_x, rdsmess_offset_y + lineSpacing);
+  }
+}
     
 
     if (isCB()) {
@@ -2309,57 +2359,7 @@ void showRDSStation()
   drawSprite();
 }
 
-if (currentMode == FM) {
-  // Configuration de l'affichage
-  spr.setTextDatum(TL_DATUM);
-  spr.setFreeFont(&PixelOperator8pt7b);
-  spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
 
-  const int max_line_len = 30; // Nombre maximum de caractères par ligne
-  char line1[max_line_len + 1];
-  char line2[max_line_len + 1];
-
-  int len = strlen(bufferRdsMsg);
-
-  // Si le message tient sur une seule ligne, pas de découpage nécessaire
-  if (len <= max_line_len) {
-    strncpy(line1, bufferRdsMsg, max_line_len);
-    line1[len] = '\0';
-    line2[0] = '\0';
-  } else {
-    // Chercher le dernier espace dans la portion de texte destinée à la première ligne
-    int breakIndex = max_line_len;
-    while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
-      breakIndex--;
-    }
-    
-    // Si aucun espace n'est trouvé, on garde la coupure fixe
-    if (breakIndex == 0) {
-      breakIndex = max_line_len;
-    }
-    
-    // Copie de la première ligne jusqu'au point de découpe
-    strncpy(line1, bufferRdsMsg, breakIndex);
-    line1[breakIndex] = '\0';
-    
-    // Sauter les espaces en début de la seconde ligne
-    int startSecondLine = breakIndex;
-    while (bufferRdsMsg[startSecondLine] == ' ' && startSecondLine < len) {
-      startSecondLine++;
-    }
-    
-    // Copier le reste pour la deuxième ligne, avec une limite
-    strncpy(line2, bufferRdsMsg + startSecondLine, max_line_len);
-    line2[max_line_len] = '\0';
-  }
-
-  // Affichage des lignes
-  spr.drawString(line1, rdsmess_offset_x, rdsmess_offset_y);
-  if (strlen(line2) > 0) {
-    int lineSpacing = 13; // Ajustez en fonction de la hauteur de la police
-    spr.drawString(line2, rdsmess_offset_x, rdsmess_offset_y + lineSpacing);
-  }
-}
 
 //void showRDSTime()
 //{
