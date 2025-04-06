@@ -2228,43 +2228,6 @@ void drawSprite()
       spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
     }
 
-// RDS message
-if (currentMode == FM) {
-  spr.setTextDatum(TL_DATUM);
-  spr.setFreeFont (&PixelOperator8pt7b);
-  spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
-
-  // Préparation des buffers pour deux lignes (25 caractères + 1 pour le '\0')
-  char line1[31];
-  char line2[31];
-
-  // Copie des 25 premiers caractères dans line1
-  strncpy(line1, bufferRdsMsg, 30);
-  line1[30] = '\0'; // Assurez-vous de terminer la chaîne
-
-  // Calcul de la longueur totale de bufferRdsMsg
-  int len = strlen(bufferRdsMsg);
-  
-if (len > 30) 
-{
-    // Copie des caractères suivants jusqu'à 25 caractères dans line2
-    strncpy(line2, bufferRdsMsg + 30, 30);
-    line2[30] = '\0';
-  } 
-else {
-    line2[0] = '\0'; // Si le message ne dépasse pas 25 caractères
-  }
-
-  // Affichage de la première ligne
-  spr.drawString(line1, rdsmess_offset_x, rdsmess_offset_y);
-
-  // Affichage de la deuxième ligne avec un décalage vertical, si elle n'est pas vide
-  if (strlen(line2) > 0) 
-  {
-    int lineSpacing = 13; // Ajustez cette valeur en fonction de la hauteur de la police
-    spr.drawString(line2, rdsmess_offset_x, rdsmess_offset_y + lineSpacing);
-  }
-}
 
     
 
@@ -2344,6 +2307,58 @@ void showRDSStation()
   cleanBfoRdsInfo();
   strcpy(bufferStationName, stationName);
   drawSprite();
+}
+
+if (currentMode == FM) {
+  // Configuration de l'affichage
+  spr.setTextDatum(TL_DATUM);
+  spr.setFreeFont(&PixelOperator8pt7b);
+  spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
+
+  const int max_line_len = 30; // Nombre maximum de caractères par ligne
+  char line1[max_line_len + 1];
+  char line2[max_line_len + 1];
+
+  int len = strlen(bufferRdsMsg);
+
+  // Si le message tient sur une seule ligne, pas de découpage nécessaire
+  if (len <= max_line_len) {
+    strncpy(line1, bufferRdsMsg, max_line_len);
+    line1[len] = '\0';
+    line2[0] = '\0';
+  } else {
+    // Chercher le dernier espace dans la portion de texte destinée à la première ligne
+    int breakIndex = max_line_len;
+    while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
+      breakIndex--;
+    }
+    
+    // Si aucun espace n'est trouvé, on garde la coupure fixe
+    if (breakIndex == 0) {
+      breakIndex = max_line_len;
+    }
+    
+    // Copie de la première ligne jusqu'au point de découpe
+    strncpy(line1, bufferRdsMsg, breakIndex);
+    line1[breakIndex] = '\0';
+    
+    // Sauter les espaces en début de la seconde ligne
+    int startSecondLine = breakIndex;
+    while (bufferRdsMsg[startSecondLine] == ' ' && startSecondLine < len) {
+      startSecondLine++;
+    }
+    
+    // Copier le reste pour la deuxième ligne, avec une limite
+    strncpy(line2, bufferRdsMsg + startSecondLine, max_line_len);
+    line2[max_line_len] = '\0';
+  }
+
+  // Affichage des lignes
+  spr.drawString(line1, rdsmess_offset_x, rdsmess_offset_y);
+  if (strlen(line2) > 0) {
+    int lineSpacing = 13; // Ajustez en fonction de la hauteur de la police
+    spr.drawString(line2, rdsmess_offset_x, rdsmess_offset_y + lineSpacing);
+  }
 }
 
 //void showRDSTime()
