@@ -2236,7 +2236,7 @@ spr.fillRect(meter_offset_x + margin, meter_offset_y + margin, fillWidth, innerH
 //-----------------------------------------------------
 
 // Utilisation de la police PixelOperator8p pour les graduations
-spr.setFreeFont(&PixelOperator8p);
+spr.setFreeFont(&PixelOperator8pt7b);
 
 // Valeurs des graduations à afficher (pour S0 à S9+60)
 // Pour les valeurs inférieures à 10, on affiche le chiffre seul, pour les autres, on ajoute un "+"
