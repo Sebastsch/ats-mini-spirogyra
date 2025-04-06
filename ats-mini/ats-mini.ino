@@ -2294,7 +2294,7 @@ int centerX = signalTextX + signalTextWidth / 2;
 uint16_t textColor = (centerX < (meter_offset_x + margin + fillWidth)) ? invertedTextColor : normalTextColor;
 
 // Afficher la valeur numérique dans le cadre
-spr.drawString(signalText, signalTextX, signalTextY, textColor);
+spr.drawString(signalText, signalTextX, signalTextY, textColor,2);
 
 
 
