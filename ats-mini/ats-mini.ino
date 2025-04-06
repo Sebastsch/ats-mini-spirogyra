@@ -11,7 +11,6 @@
 #include "poxel_font16pt7b.h"      //Font1 Band
 #include "Technology10pt7b.h"       //Font2 RDS Station
 #include "PixelOperator8p.h"      //Font3 RDS Message
-#include <FreeSans9pt7b.h>  
 
 
 // =================================
@@ -2236,8 +2235,8 @@ spr.fillRect(meter_offset_x + margin, meter_offset_y + margin, fillWidth, innerH
 // 2. Affichage des graduations et des libellés
 //-----------------------------------------------------
 
-// Utilisation de la police "FreeSans9pt7b" (provenant de TFT_eSPI) pour les graduations
-spr.setFreeFont(&FreeSans9pt7b);
+// Utilisation de la police PixelOperator8p pour les graduations
+spr.setFreeFont(&PixelOperator8p);
 
 // Valeurs des graduations à afficher (pour S0 à S9+60)
 // Pour les valeurs inférieures à 10, on affiche le chiffre seul, pour les autres, on ajoute un "+"
