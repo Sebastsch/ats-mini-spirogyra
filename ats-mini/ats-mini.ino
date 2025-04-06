@@ -2195,16 +2195,124 @@ void drawSprite()
       spr.drawString(bfo,80,158,4);
     }
 
+
+
+
+
+// Dimensions du cadre complet
+const int frameW  = 100;
+const int frameH  = 15;
+const int margin  = 1;                   // Marge pour le cadre interne (pour ne pas écraser les bords)
+const int innerW  = frameW - 2 * margin;  // Zone d'affichage interne en largeur (ici 98)
+const int innerH  = frameH - 2 * margin;  // Zone d'affichage interne en hauteur (ici 13)
+
+// Récupération et bornage du signal (entre 0 et 60 dB)
+// Conversion linéaire : dB = (getStrength() - 1) * (60.0 / 16.0)
+double signal_dB = (getStrength() - 1) * (60.0 / 16.0);
+if (signal_dB < 0)  signal_dB = 0;
+if (signal_dB > 60) signal_dB = 60;
+
+// Calcul de la largeur (en pixels) de la zone remplie à l'intérieur du cadre
+int fillWidth = (int)((signal_dB / 60.0) * innerW);
+
+// Définition des couleurs pour le texte : la couleur "normale" et sa version inversée
+uint16_t normalTextColor  = theme[themeIdx].smeter_icon;
+uint16_t invertedTextColor = normalTextColor ^ 0xFFFF; // inversion simple
+
+//-----------------------------------------------------
+// 1. Dessin du cadre et du remplissage (bargraph)
+//-----------------------------------------------------
+
+// Effacer le cadre en remplissant la zone de fond
+spr.fillRect(meter_offset_x, meter_offset_y, frameW, frameH, theme[themeIdx].bg);
+
+// Dessiner le contour du cadre de 100×15 pixels
+spr.drawRect(meter_offset_x, meter_offset_y, frameW, frameH, theme[themeIdx].smeter_icon);
+
+// Remplir la zone intérieure (à l'intérieur du cadre) jusqu'au niveau du signal
+spr.fillRect(meter_offset_x + margin, meter_offset_y + margin, fillWidth, innerH, theme[themeIdx].smeter_bar);
+
+//-----------------------------------------------------
+// 2. Affichage des graduations et des étiquettes
+//-----------------------------------------------------
+
+// Utilisation d'une police réduite pour afficher les graduations
+spr.setFreeFont(&PixelOperator6pt7b);
+
+// Valeurs des graduations à afficher (pour S0 à S9+60)
+// Pour les valeurs inférieures à 10, on affiche le chiffre seul, pour les autres, on ajoute un "+"
+int gradValues[9] = {1, 3, 5, 7, 9, 10, 20, 40, 60};
+const int numGrad = 9;
+
+// Position verticale pour les ticks de graduation
+int tickY_start = meter_offset_y + frameH - margin - 4;  // par exemple, 4 pixels de hauteur pour le tick
+int tickY_end   = tickY_start + 3;
+
+for (int i = 0; i < numGrad; i++) {
+  int val = gradValues[i];
+  // Calcul de la position X, en se basant sur la proportion (val/60) sur la largeur interne
+  int gradX = meter_offset_x + margin + (int)((val / 60.0) * innerW);
+  
+  // Choix de la couleur : si la position du tick est dans la zone remplie, inversion de la couleur
+  uint16_t currentColor = (gradX < (meter_offset_x + margin + fillWidth)) ? invertedTextColor : normalTextColor;
+  
+  // Dessiner le tick vertical sur la ligne graduée
+  spr.drawLine(gradX, tickY_start, gradX, tickY_end, currentColor);
+  
+  // Préparer le libellé de graduation (affichage direct pour val < 10, sinon avec "+")
+  char gradLabel[6];
+  if (val < 10)
+    sprintf(gradLabel, "%d", val);
+  else
+    sprintf(gradLabel, "+%d", val);
+  
+  // Calculer la largeur du texte pour le centrer précisément sur le tick
+  int labelWidth = spr.textWidth(gradLabel);
+  int labelX = gradX - labelWidth / 2;
+  
+  // Position verticale du texte (au-dessus du tick)
+  int labelY = tickY_start - 8;  // Ajustez selon la hauteur de la police utilisée
+  
+  spr.drawString(gradLabel, labelX, labelY, currentColor);
+}
+
+//-----------------------------------------------------
+// 3. Affichage de la valeur numérique du signal
+//-----------------------------------------------------
+
+// Préparer la chaîne avec la valeur du signal (par exemple, "45 dB")
+char signalText[10];
+sprintf(signalText, "%.0f dB", signal_dB);
+int signalTextWidth = spr.textWidth(signalText);
+
+// Centrer le texte horizontalement dans le cadre
+int signalTextX = meter_offset_x + (frameW - signalTextWidth) / 2;
+// Position verticale ajustée (par exemple, en haut du cadre)
+int signalTextY = meter_offset_y + 2;
+
+// Déterminer la couleur du texte en se basant sur sa position centrale
+int centerX = signalTextX + signalTextWidth / 2;
+uint16_t textColor = (centerX < (meter_offset_x + margin + fillWidth)) ? invertedTextColor : normalTextColor;
+
+// Afficher la valeur numérique dans le cadre
+spr.drawString(signalText, signalTextX, signalTextY, textColor);
+
+
+
+
+
+
+
     // S-Meter
-    spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
-    spr.drawLine(meter_offset_x + 6, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 14, theme[themeIdx].smeter_icon);
-    for(int i=0; i<getStrength(); i++) {
-      if (i<10) {
-        spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar);
-      } else {
-        spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar_plus);
-      }
-    }
+   // spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
+   // spr.drawLine(meter_offset_x + 6, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 14, theme[themeIdx].smeter_icon);
+ //   for(int i=0; i<getStrength(); i++) {
+ //     if (i<10) {
+ //       spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar);
+//      } else {
+//        spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar_plus);
+ //     }
+ //   }
 
     
     //Icone Stereo
