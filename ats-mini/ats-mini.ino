@@ -2195,7 +2195,9 @@ void drawSprite()
       spr.drawString(bfo,80,158,4);
     }
 
-// --- Nouvelle version du S-mètre ---
+
+
+    // --- Nouvelle version du S-mètre ---
 // Affiche une barre de signal de 100 pixels de large par 4 pixels de haut,
 // avec en dessous la chaîne "1•3•5•7•9•+10•+20•+30"
 
@@ -2230,6 +2232,9 @@ int labelY = barY + barHeight + 4; // un petit espace sous la barre
 
 // Utiliser un facteur d'échelle (ici : 1)
 spr.drawString(labelText, labelX, labelY, 1);
+
+    
+    
 
 
     // S-Meter
