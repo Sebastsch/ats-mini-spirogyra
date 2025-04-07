@@ -2423,10 +2423,10 @@ void showRDSStation()
 void checkRDS()
 {
   rx.getRdsStatus();
-  //if (rx.getRdsReceived())
+  if (rx.getRdsSync() && rx.getRdsReceived())
   //{
-    if (rx.getRdsSync() && rx.getRdsSyncFound())
-    {
+  //  if (rx.getRdsSync() && rx.getRdsSyncFound())
+  {
       rdsMsg = rx.getRdsText2A();
       stationName = rx.getRdsText0A();
       rdsTime = rx.getRdsTime();
