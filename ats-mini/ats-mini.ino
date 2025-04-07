@@ -2195,73 +2195,38 @@ void drawSprite()
       spr.drawString(bfo,80,158,4);
     }
 
+// --- Nouvelle version du S-mètre ---
+// Affiche une barre de signal de 100 pixels de large par 4 pixels de haut,
+// avec en dessous la chaîne "1•3•5•7•9•+10•+20•+30"
 
+// Définition des dimensions de la barre
+int barWidth  = 100;  // largeur maximale
+int barHeight = 4;    // hauteur de la barre
 
-//-----------------------------------------------------
-// S-mètre sans cadre, avec petits carrés et valeurs en dessous
-//-----------------------------------------------------
+// Position d'affichage (vous pouvez ajuster meter_offset_x et meter_offset_y selon vos besoins)
+int barX = meter_offset_x;
+int barY = meter_offset_y;
 
-// Paramètres pour les carrés
-const int numSquares    = 8;   // Il y aura 8 carrés correspondant aux valeurs affichées
-const int squareSize    = 8;   // Taille de chaque carré (en pixels)
-const int squareSpacing = 2;   // Espace horizontal entre chaque carré (en pixels)
+// Dessine le contour de la barre
+spr.drawRect(barX, barY, barWidth, barHeight, theme[themeIdx].smeter_icon);
 
-//-----------------------------------------------------
-// 1. Calcul du signal et du nombre de carrés remplis
-//-----------------------------------------------------
-// Conversion de la force brute en décibels : 
-// dB = (getStrength() - 1) * (60.0 / 16.0)
-double signal_dB = (getStrength() - 1) * (60.0 / 16.0);
-if (signal_dB < 0)  signal_dB = 0;
-if (signal_dB > 60) signal_dB = 60;
+// Calcule la force du signal
+// Ici, on suppose que getStrength() retourne une valeur entre 1 (min) et 17 (max)
+int strength = getStrength();
+// On mappe linéairement de [1, 17] à [0, 100] pixels :
+int fillWidth = ((strength - 1) * barWidth) / 16;
 
-// Calcul du nombre de carrés à remplir (proportionnel à signal_dB)
-int fillSquares = (int)((signal_dB / 60.0) * numSquares + 0.5);
+// Remplit la barre selon la force du signal
+// On décale de 1 pixel pour tenir compte du contour
+spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
 
-//-----------------------------------------------------
-// 2. Affichage des carrés
-//-----------------------------------------------------
-for (int i = 0; i < numSquares; i++) {
-    // Calcul de la position X de chaque carré
-    int x = meter_offset_x + i * (squareSize + squareSpacing);
-    int y = meter_offset_y;
-    
-    if (i < fillSquares) {
-        // Carré rempli (niveau atteint)
-        spr.fillRect(x, y, squareSize, squareSize, theme[themeIdx].smeter_bar);
-    } else {
-        // Carré non rempli : afficher uniquement le contour
-        spr.drawRect(x, y, squareSize, squareSize, theme[themeIdx].smeter_icon);
-    }
-}
-
-//-----------------------------------------------------
-// 3. Affichage des valeurs correspondantes en dessous
-//-----------------------------------------------------
-// Texte à afficher exactement : "1•3•5•7•9•+10•+20•+30"
-
-    const char* labelText = "1•3•5•7•9•+10•+20•+30";
-
-// On calcule la largeur totale occupée par les carrés
-
-    int totalSquaresWidth = numSquares * squareSize + (numSquares - 1) * squareSpacing;
-
-// Calcul de la largeur du texte ainsi que de la position X pour centrer le texte sous les carrés
-
-    int labelsWidth = spr.textWidth(labelText);
-
-    int labelX = meter_offset_x + (totalSquaresWidth - labelsWidth) / 2;
-
-// Position verticale en dessous des carrés (ajustez l'espacement vertical au besoin)
-
-    int labelY = meter_offset_y + squareSize + 2;
-
-// Affichage du texte avec la couleur définie (ici la même pour tous les éléments)
-    spr.setFreeFont(&PixelOperator8pt7b);
-    spr.drawString(labelText, labelX, labelY, theme[themeIdx].smeter_icon);
-
-    
-
+// Affiche la légende en dessous de la barre
+const char* labelText = "1•3•5•7•9•+10•+20•+30";
+spr.setFreeFont(&PixelOperator8pt7b);
+int labelWidth = spr.textWidth(labelText);
+int labelX = barX + (barWidth - labelWidth) / 2;
+int labelY = barY + barHeight + 2; // Un léger espace sous la barre
+spr.drawString(labelText, labelX, labelY, theme[themeIdx].smeter_icon);
 
     // S-Meter
    // spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
