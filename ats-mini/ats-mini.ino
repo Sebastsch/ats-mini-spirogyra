@@ -2239,20 +2239,26 @@ for (int i = 0; i < numSquares; i++) {
 // 3. Affichage des valeurs correspondantes en dessous
 //-----------------------------------------------------
 // Texte à afficher exactement : "1•3•5•7•9•+10•+20•+30"
-const char* labelText = "1•3•5•7•9•+10•+20•+30";
+
+    const char* labelText = "1•3•5•7•9•+10•+20•+30";
 
 // On calcule la largeur totale occupée par les carrés
-int totalSquaresWidth = numSquares * squareSize + (numSquares - 1) * squareSpacing;
+
+    int totalSquaresWidth = numSquares * squareSize + (numSquares - 1) * squareSpacing;
 
 // Calcul de la largeur du texte ainsi que de la position X pour centrer le texte sous les carrés
-int labelsWidth = spr.textWidth(labelText);
-int labelX = meter_offset_x + (totalSquaresWidth - labelsWidth) / 2;
+
+    int labelsWidth = spr.textWidth(labelText);
+
+    int labelX = meter_offset_x + (totalSquaresWidth - labelsWidth) / 2;
 
 // Position verticale en dessous des carrés (ajustez l'espacement vertical au besoin)
-int labelY = meter_offset_y + squareSize + 2;
+
+    int labelY = meter_offset_y + squareSize + 2;
 
 // Affichage du texte avec la couleur définie (ici la même pour tous les éléments)
-spr.drawString(labelText, labelX, labelY, theme[themeIdx].smeter_icon);
+    spr.setFreeFont(&PixelOperator8pt7b);
+    spr.drawString(labelText, labelX, labelY, theme[themeIdx].smeter_icon);
 
     
 
