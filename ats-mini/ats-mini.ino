@@ -263,6 +263,8 @@ bool pb1_long_released = false;         // Push button long released
 
 bool display_on = true;                 // Display state
 
+bool isDimmed = false;
+
 // Status bar icon flags
 bool screen_toggle = false;             // Toggle when drawsprite is called
 bool eeprom_wr_flag = false;            // Flag indicating EEPROM write request
@@ -3047,6 +3049,20 @@ void getColorTheme() {
  * Main loop
  */
 void loop() {
+
+
+// Détection d'une interaction par l'encodeur : s'il y a rotation, on réactive le rétroéclairage.
+if (encoderCount != 0 && display_on) {
+  if (isDimmed) {
+    isDimmed = false;
+    // Augmente la luminosité d'un pas (la fonction doBrt(1) augmente currentBrt de 32, avec plafonnement à 255)
+    doBrt(1);
+  }
+  // Réinitialise le timer de veille dès qu'une interaction est détectée.
+  elapsedSleep = millis();
+}
+
+  
   // Check if the encoder has moved.
   if (encoderCount != 0 && !display_on) {
     encoderCount = 0;
@@ -3259,11 +3275,29 @@ void loop() {
   }
 
   // Display sleep timeout
-  if (currentSleep && display_on) {
-    if ((millis() - elapsedSleep) > currentSleep * 1000) {
-      displayOff();
+  //if (currentSleep && display_on) {
+  //  if ((millis() - elapsedSleep) > currentSleep * 1000) {
+  //    displayOff();
+  // }
+  //}
+
+
+// Gestion du timeout de veille : diminuer le rétroéclairage au lieu d'éteindre l'écran
+if (currentSleep && display_on) {
+  if ((millis() - elapsedSleep) > currentSleep * 1000) {
+    // Si la luminosité est supérieure au seuil minimal (ici 32), la diminuer par paliers
+    if (currentBrt > 32) {
+      doBrt(0);  // Appel avec argument 0 diminue currentBrt par 32 (ou 31 si currentBrt == 255)
+      isDimmed = true;  // On note qu'on est en mode "dim"
+      delay(100);  // Petite pause pour obtenir l'effet progressif (ajustez si besoin)
     }
+    // Sinon, vous pouvez laisser currentBrt à sa valeur minimale (32)
   }
+}
+
+
+
+  
 
   // Show RSSI status only if this condition has changed
   if ((millis() - elapsedRSSI) > MIN_ELAPSED_RSSI_TIME * 6)
