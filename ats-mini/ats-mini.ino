@@ -2216,7 +2216,7 @@ int strength = getStrength();
 int fillWidth = ((strength - 1) * barWidth) / 16;
 
 // Remplir la barre (décalage de 1 pixel pour tenir compte du contour)
-spr.fillRect(barX , barY , fillWidth, barHeight , theme[themeIdx].smeter_bar);
+spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
 
 // Afficher la légende en dessous
 const char* labelText = "1•3•5•7•9•+10•+20•+30";
