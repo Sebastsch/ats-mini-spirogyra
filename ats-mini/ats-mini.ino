@@ -84,8 +84,8 @@
 #define rdsmess_offset_x   100    // RDS message horizontal offset
 #define rdsmess_offset_y    92    // RDS message vertical offset
 
-#define batt_offset_x  288    // Battery meter x offset
-#define batt_offset_y    0    // Battery meter y offset
+#define batt_offset_x  282    // Battery meter x offset
+#define batt_offset_y    2    // Battery meter y offset
 #define clock_datum     90    // Clock x offset
 
 // Stereo (or mono) mode indicator by m2608
@@ -2381,6 +2381,7 @@ if (currentMode == FM) {
 void cleanBfoRdsInfo()
 {
   bufferStationName[0]='\0';
+  bufferRdsMsg[0] = '\0';
 }
 
 void showRDSMsg()
