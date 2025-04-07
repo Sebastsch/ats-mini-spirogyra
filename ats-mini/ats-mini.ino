@@ -3049,25 +3049,6 @@ void getColorTheme() {
  * Main loop
  */
 void loop() {
-
-
-// Supposons que defaultBrt contienne la valeur de départ ou celle issue de l'EEPROM.
-const uint16_t defaultBrt = 128; // Exemple de valeur par défaut
-
-// Dans la détection d'interaction :
-if (encoderCount != 0 && display_on) {
-  if (isDimmed) {
-    isDimmed = false;
-    // Restaurer complètement la luminosité au lieu de l'incrémenter d'un simple palier.
-    currentBrt = defaultBrt;
-    ledcWrite(PIN_LCD_BL, currentBrt);
-    showBrt();
-  }
-  elapsedSleep = millis();
-}
-
-
-  
   // Check if the encoder has moved.
   if (encoderCount != 0 && !display_on) {
     encoderCount = 0;
@@ -3279,29 +3260,12 @@ if (encoderCount != 0 && display_on) {
     }
   }
 
-  // Display sleep timeout
-  //if (currentSleep && display_on) {
-  //  if ((millis() - elapsedSleep) > currentSleep * 1000) {
-  //    displayOff();
-  // }
-  //}
-
-
-// Gestion du timeout de veille : diminuer le rétroéclairage au lieu d'éteindre l'écran
-if (currentSleep && display_on) {
-  if ((millis() - elapsedSleep) > currentSleep * 1000) {
-    if (currentBrt > 2) {
-      doBrt(0);      // diminue currentBrt par un pas (32 ou 31 points)
-      isDimmed = true;
-      delay(100);
-    }
+   Display sleep timeout
+  if (currentSleep && display_on) {
+    if ((millis() - elapsedSleep) > currentSleep * 1000) {
+      displayOff();
+   }
   }
-}
-
-
-
-
-  
 
   // Show RSSI status only if this condition has changed
   if ((millis() - elapsedRSSI) > MIN_ELAPSED_RSSI_TIME * 6)
