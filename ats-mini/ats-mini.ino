@@ -3260,12 +3260,12 @@ void loop() {
     }
   }
 
-   Display sleep timeout
-  if (currentSleep && display_on) {
-    if ((millis() - elapsedSleep) > currentSleep * 1000) {
-      displayOff();
-   }
-  }
+  // Display sleep timeout
+  //if (currentSleep && display_on) {
+  //  if ((millis() - elapsedSleep) > currentSleep * 1000) {
+  //    displayOff();
+  // }
+  //}
 
   // Show RSSI status only if this condition has changed
   if ((millis() - elapsedRSSI) > MIN_ELAPSED_RSSI_TIME * 6)
