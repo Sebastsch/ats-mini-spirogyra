@@ -66,8 +66,8 @@
 #define menu_delta_x    10    // Menu width delta
 #define meter_offset_x   0    // Meter horizontal offset
 #define meter_offset_y   0    // Meter vertical offset
-#define save_offset_x   87    // EEPROM save icon horizontal offset
-#define save_offset_y    0    // EEPROM save icon vertical offset
+#define save_offset_x   300    // EEPROM save icon horizontal offset
+#define save_offset_y   150    // EEPROM save icon vertical offset
 #define freq_offset_x  250    // Frequency horizontal offset
 #define freq_offset_y   65    // Frequency vertical offset
 #define funit_offset_x 255    // Frequency Unit horizontal offset
@@ -2199,34 +2199,38 @@ void drawSprite()
 // Affiche une barre de signal de 100 pixels de large par 4 pixels de haut,
 // avec en dessous la chaîne "1•3•5•7•9•+10•+20•+30"
 
-// Définition des dimensions de la barre
+// Dimensions de la barre
 int barWidth  = 100;  // largeur maximale
 int barHeight = 4;    // hauteur de la barre
 
-// Position d'affichage (vous pouvez ajuster meter_offset_x et meter_offset_y selon vos besoins)
+// Position d'affichage (ajustez meter_offset_x et meter_offset_y si besoin)
 int barX = meter_offset_x;
 int barY = meter_offset_y;
 
-// Dessine le contour de la barre
+// Dessiner le contour de la barre
 spr.drawRect(barX, barY, barWidth, barHeight, theme[themeIdx].smeter_icon);
 
-// Calcule la force du signal
-// Ici, on suppose que getStrength() retourne une valeur entre 1 (min) et 17 (max)
+// Calcul de la force du signal (getStrength() retourne une valeur entre 1 et 17)
 int strength = getStrength();
-// On mappe linéairement de [1, 17] à [0, 100] pixels :
+// Mappage linéaire de [1, 17] vers [0, 100] pixels
 int fillWidth = ((strength - 1) * barWidth) / 16;
 
-// Remplit la barre selon la force du signal
-// On décale de 1 pixel pour tenir compte du contour
+// Remplir la barre (décalage de 1 pixel pour tenir compte du contour)
 spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
 
-// Affiche la légende en dessous de la barre
+// Afficher la légende en dessous
 const char* labelText = "1•3•5•7•9•+10•+20•+30";
+
+// On détermine la largeur du texte et on le centre par rapport à la barre
 spr.setFreeFont(&PixelOperator8pt7b);
+spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
 int labelWidth = spr.textWidth(labelText);
 int labelX = barX + (barWidth - labelWidth) / 2;
-int labelY = barY + barHeight + 2; // Un léger espace sous la barre
-spr.drawString(labelText, labelX, labelY, theme[themeIdx].smeter_icon);
+int labelY = barY + barHeight + 2; // un petit espace sous la barre
+
+// Utiliser un facteur d'échelle (ici : 1)
+spr.drawString(labelText, labelX, labelY, 1);
+
 
     // S-Meter
    // spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
