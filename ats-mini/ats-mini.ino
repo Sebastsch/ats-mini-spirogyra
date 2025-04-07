@@ -3052,7 +3052,7 @@ void loop() {
 
 
 // Supposons que defaultBrt contienne la valeur de départ ou celle issue de l'EEPROM.
-const uint16_t defaultBrt = 128; // Exemple de valeur par défaut
+//const uint16_t defaultBrt = 128; // Exemple de valeur par défaut
 
 // Dans la détection d'interaction :
 if (encoderCount != 0 && display_on) {
@@ -3065,6 +3065,7 @@ if (encoderCount != 0 && display_on) {
   }
   elapsedSleep = millis();
 }
+
 
   
   // Check if the encoder has moved.
