@@ -2361,10 +2361,10 @@ void cleanBfoRdsInfo()
 
 void showRDSStation()
 {
-  rdsStation[50] = bufferStationName[50] = '\0';
+  stationName[50] = bufferStationName[50] = '\0';
   if (strcmp(bufferStationName, stationName) == 0 ) return;
   cleanBfoRdsInfo();
-  strcpy(bufferStationName, rdsStation);
+  strcpy(bufferStationName, stationName);
   drawSprite();
 }
 
