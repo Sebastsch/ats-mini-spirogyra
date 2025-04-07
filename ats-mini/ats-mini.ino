@@ -2400,8 +2400,6 @@ void showRDSStation()
   drawSprite();
 }
 
-
-
 //void showRDSTime()
 //{
 //  if (strcmp(bufferRdsTime, rdsTime) == 0)
@@ -2419,14 +2417,13 @@ void showRDSStation()
 //  drawSprite();
 //}
 
-
 void checkRDS()
 {
   rx.getRdsStatus();
-  if (rx.getRdsSync() && rx.getRdsReceived())
-  //{
-  //  if (rx.getRdsSync() && rx.getRdsSyncFound())
+  if (rx.getRdsReceived())
   {
+    if (rx.getRdsSync() && rx.getRdsSyncFound())
+    {
       rdsMsg = rx.getRdsText2A();
       stationName = rx.getRdsText0A();
       rdsTime = rx.getRdsTime();
@@ -2439,8 +2436,6 @@ void checkRDS()
     }
   }
 }
-
-
 
 void checkCBChannel()
 {
