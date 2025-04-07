@@ -64,8 +64,8 @@
 #define menu_offset_x    0    // Menu horizontal offset
 #define menu_offset_y   20    // Menu vertical offset
 #define menu_delta_x    10    // Menu width delta
-#define meter_offset_x   0    // Meter horizontal offset
-#define meter_offset_y   0    // Meter vertical offset
+#define meter_offset_x   2    // Meter horizontal offset
+#define meter_offset_y   2    // Meter vertical offset
 #define save_offset_x   300    // EEPROM save icon horizontal offset
 #define save_offset_y   150    // EEPROM save icon vertical offset
 #define freq_offset_x  250    // Frequency horizontal offset
@@ -2226,7 +2226,7 @@ spr.setFreeFont(&PixelOperator8pt7b);
 spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
 int labelWidth = spr.textWidth(labelText);
 int labelX = barX + (barWidth - labelWidth) / 2;
-int labelY = barY + barHeight + 2; // un petit espace sous la barre
+int labelY = barY + barHeight + 4; // un petit espace sous la barre
 
 // Utiliser un facteur d'échelle (ici : 1)
 spr.drawString(labelText, labelX, labelY, 1);
