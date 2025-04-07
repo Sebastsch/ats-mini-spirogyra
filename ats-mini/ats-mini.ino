@@ -2285,9 +2285,9 @@ for (int i = 0; i < numSquares; i++) {
     
 // RDS Station
     if (currentMode == FM) {
-      if (rx.getCurrentPilot()) {
-        spr.fillRect(15 + meter_offset_x, 7+meter_offset_y, 4*17, 2, theme[themeIdx].bg);
-      }
+      //if (rx.getCurrentPilot()) {
+      //  spr.fillRect(15 + meter_offset_x, 7+meter_offset_y, 4*17, 2, theme[themeIdx].bg);
+    //  }
 
       spr.setTextDatum(MR_DATUM);
       spr.setFreeFont(&Technology10pt7b);
