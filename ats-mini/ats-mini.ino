@@ -3289,7 +3289,7 @@ if (encoderCount != 0 && display_on) {
 // Gestion du timeout de veille : diminuer le rétroéclairage au lieu d'éteindre l'écran
 if (currentSleep && display_on) {
   if ((millis() - elapsedSleep) > currentSleep * 1000) {
-    if (currentBrt > 12) {
+    if (currentBrt > 2) {
       doBrt(0);      // diminue currentBrt par un pas (32 ou 31 points)
       isDimmed = true;
       delay(100);
