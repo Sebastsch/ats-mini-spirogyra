@@ -64,10 +64,10 @@
 #define menu_offset_x    0    // Menu horizontal offset
 #define menu_offset_y   20    // Menu vertical offset
 #define menu_delta_x    10    // Menu width delta
-#define meter_offset_x   2    // Meter horizontal offset
-#define meter_offset_y   2    // Meter vertical offset
+#define meter_offset_x   0    // Meter horizontal offset
+#define meter_offset_y   0    // Meter vertical offset
 #define save_offset_x   300    // EEPROM save icon horizontal offset
-#define save_offset_y   150    // EEPROM save icon vertical offset
+#define save_offset_y   125    // EEPROM save icon vertical offset
 #define freq_offset_x  250    // Frequency horizontal offset
 #define freq_offset_y   65    // Frequency vertical offset
 #define funit_offset_x 255    // Frequency Unit horizontal offset
@@ -2208,7 +2208,7 @@ int barX = meter_offset_x;
 int barY = meter_offset_y;
 
 // Dessiner le contour de la barre
-spr.drawRect(barX, barY, barWidth, barHeight, theme[themeIdx].smeter_icon);
+//spr.drawRect(barX, barY, barWidth, barHeight, theme[themeIdx].smeter_icon);
 
 // Calcul de la force du signal (getStrength() retourne une valeur entre 1 et 17)
 int strength = getStrength();
@@ -2216,7 +2216,7 @@ int strength = getStrength();
 int fillWidth = ((strength - 1) * barWidth) / 16;
 
 // Remplir la barre (décalage de 1 pixel pour tenir compte du contour)
-spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
+spr.fillRect(barX , barY , fillWidth, barHeight , theme[themeIdx].smeter_bar);
 
 // Afficher la légende en dessous
 const char* labelText = "1•3•5•7•9•+10•+20•+30";
