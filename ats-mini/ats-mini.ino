@@ -2197,103 +2197,64 @@ void drawSprite()
 
 
 
+//-----------------------------------------------------
+// S-mètre sans cadre, avec petits carrés et valeurs en dessous
+//-----------------------------------------------------
 
-// Dimensions du cadre complet
-const int frameW  = 100;
-const int frameH  = 15;
-const int margin  = 1;                   // Marge pour le cadre interne (pour ne pas écraser les bords)
-const int innerW  = frameW - 2 * margin;  // Zone d'affichage interne en largeur (98 pixels)
-const int innerH  = frameH - 2 * margin;  // Zone d'affichage interne en hauteur (13 pixels)
+// Paramètres pour les carrés
+const int numSquares    = 8;   // Il y aura 8 carrés correspondant aux valeurs affichées
+const int squareSize    = 8;   // Taille de chaque carré (en pixels)
+const int squareSpacing = 2;   // Espace horizontal entre chaque carré (en pixels)
 
-// Récupération et bornage du signal (entre 0 et 60 dB)
-// Conversion linéaire : dB = (getStrength() - 1) * (60.0 / 16.0)
+//-----------------------------------------------------
+// 1. Calcul du signal et du nombre de carrés remplis
+//-----------------------------------------------------
+// Conversion de la force brute en décibels : 
+// dB = (getStrength() - 1) * (60.0 / 16.0)
 double signal_dB = (getStrength() - 1) * (60.0 / 16.0);
 if (signal_dB < 0)  signal_dB = 0;
 if (signal_dB > 60) signal_dB = 60;
 
-// Calcul de la largeur (en pixels) de la zone remplie à l'intérieur du cadre
-int fillWidth = (int)((signal_dB / 60.0) * innerW);
-
-// Définition des couleurs pour le texte : la couleur "normale" et sa version inversée
-uint16_t normalTextColor  = theme[themeIdx].smeter_icon;
-uint16_t invertedTextColor = normalTextColor ^ 0xFFFF; // inversion simple par XOR
+// Calcul du nombre de carrés à remplir (proportionnel à signal_dB)
+int fillSquares = (int)((signal_dB / 60.0) * numSquares + 0.5);
 
 //-----------------------------------------------------
-// 1. Cadre et remplissage (bargraph)
+// 2. Affichage des carrés
 //-----------------------------------------------------
-
-// Effacer la zone en remplissant le fond du cadre
-spr.fillRect(meter_offset_x, meter_offset_y, frameW, frameH, theme[themeIdx].bg);
-
-// Dessiner le contour du cadre de 100×15 pixels
-spr.drawRect(meter_offset_x, meter_offset_y, frameW, frameH, theme[themeIdx].smeter_icon);
-
-// Remplir la zone intérieure (bargraph) jusqu'au niveau du signal
-spr.fillRect(meter_offset_x + margin, meter_offset_y + margin, fillWidth, innerH, theme[themeIdx].smeter_bar);
-
-//-----------------------------------------------------
-// 2. Affichage des graduations et des libellés
-//-----------------------------------------------------
-
-// Utilisation de la police PixelOperator8p pour les graduations
-spr.setFreeFont(&PixelOperator8pt7b);
-
-// Valeurs des graduations à afficher (pour S0 à S9+60)
-// Pour les valeurs inférieures à 10, on affiche le chiffre seul, pour les autres, on ajoute un "+"
-int gradValues[9] = {1, 3, 5, 7, 9, 10, 20, 40, 60};
-const int numGrad = 9;
-
-// Position verticale pour les ticks de graduation
-int tickY_start = meter_offset_y + frameH - margin - 4;  // par exemple, 4 pixels pour le tick
-int tickY_end   = tickY_start + 3;  // hauteur du tick
-
-for (int i = 0; i < numGrad; i++) {
-  int val = gradValues[i];
-  // Calcul de la position X dans la zone interne : proportion (val/60) appliquée sur innerW
-  int gradX = meter_offset_x + margin + (int)((val / 60.0) * innerW);
-  
-  // Si la graduation se trouve dans la zone remplie, on inverse sa couleur
-  uint16_t currentColor = (gradX < (meter_offset_x + margin + fillWidth)) ? invertedTextColor : normalTextColor;
-  
-  // Dessin du tick vertical sur la ligne graduée
-  spr.drawLine(gradX, tickY_start, gradX, tickY_end, currentColor);
-  
-  // Préparation du label de graduation : pour val < 10 affichage direct, sinon ajout d'un "+"
-  char gradLabel[6];
-  if (val < 10)
-    sprintf(gradLabel, "%d", val);
-  else
-    sprintf(gradLabel, "+%d", val);
-  
-  // Calcule de la largeur du texte pour le centrer sur le tick
-  int labelWidth = spr.textWidth(gradLabel);
-  int labelX = gradX - labelWidth / 2;
-  
-  // Position verticale du texte (au-dessus des ticks)
-  int labelY = tickY_start - 8;  // ajuster selon la police utilisée
-  spr.drawString(gradLabel, labelX, labelY, currentColor);
+for (int i = 0; i < numSquares; i++) {
+    // Calcul de la position X de chaque carré
+    int x = meter_offset_x + i * (squareSize + squareSpacing);
+    int y = meter_offset_y;
+    
+    if (i < fillSquares) {
+        // Carré rempli (niveau atteint)
+        spr.fillRect(x, y, squareSize, squareSize, theme[themeIdx].smeter_bar);
+    } else {
+        // Carré non rempli : afficher uniquement le contour
+        spr.drawRect(x, y, squareSize, squareSize, theme[themeIdx].smeter_icon);
+    }
 }
 
 //-----------------------------------------------------
-// 3. Affichage de la valeur numérique du signal
+// 3. Affichage des valeurs correspondantes en dessous
 //-----------------------------------------------------
+// Texte à afficher exactement : "1•3•5•7•9•+10•+20•+30"
+const char* labelText = "1•3•5•7•9•+10•+20•+30";
 
-// Préparer la chaîne contenant la valeur (exemple : "45 dB")
-char signalText[10];
-sprintf(signalText, "%.0f dB", signal_dB);
-int signalTextWidth = spr.textWidth(signalText);
+// On calcule la largeur totale occupée par les carrés
+int totalSquaresWidth = numSquares * squareSize + (numSquares - 1) * squareSpacing;
 
-// Centrer le texte horizontalement dans le cadre
-int signalTextX = meter_offset_x + (frameW - signalTextWidth) / 2;
-// Position verticale (par exemple, en haut du cadre)
-int signalTextY = meter_offset_y + 2;
+// Calcul de la largeur du texte ainsi que de la position X pour centrer le texte sous les carrés
+int labelsWidth = spr.textWidth(labelText);
+int labelX = meter_offset_x + (totalSquaresWidth - labelsWidth) / 2;
 
-// Déterminer si le centre du texte se trouve dans la zone remplie afin d'inverser la couleur si besoin
-int centerX = signalTextX + signalTextWidth / 2;
-uint16_t textColor = (centerX < (meter_offset_x + margin + fillWidth)) ? invertedTextColor : normalTextColor;
+// Position verticale en dessous des carrés (ajustez l'espacement vertical au besoin)
+int labelY = meter_offset_y + squareSize + 2;
 
-spr.drawString(signalText, signalTextX, signalTextY, textColor);
+// Affichage du texte avec la couleur définie (ici la même pour tous les éléments)
+spr.drawString(labelText, labelX, labelY, theme[themeIdx].smeter_icon);
 
+    
 
 
     // S-Meter
