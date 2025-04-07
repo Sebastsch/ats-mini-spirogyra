@@ -10,7 +10,7 @@ Please note: I am not a professional developer. If you notice any issues or have
 
 # ATS Mini
 
-![](https://raw.githubusercontent.com/Sebastsch/ats-mini-spirogyra/refs/heads/main/docs/source/_static/Spirogyra%20Winamp%20theme.jpg)
+![](https://github.com/Sebastsch/ats-mini-spirogyra/blob/main/docs/source/_static/Mini%20radio%20New%20S-meter%20(test%20version).jpg)
 
 This firmware is for use on the SI4732 (ESP32-S3) Mini/Pocket Receiver
 
