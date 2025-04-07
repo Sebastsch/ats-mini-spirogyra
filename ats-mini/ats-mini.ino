@@ -2423,22 +2423,64 @@ void showRDSStation()
 void checkRDS()
 {
   rx.getRdsStatus();
-  if (rx.getRdsReceived())
+  
+  // Si du RDS est reçu, on traite normalement
+  if (rx.getRdsReceived() && rx.getRdsSync() && rx.getRdsSyncFound())
   {
-    if (rx.getRdsSync() && rx.getRdsSyncFound())
+    const char* newRdsMsg = rx.getRdsText2A();
+    const char* newStationName = rx.getRdsText0A();
+    // const char* newRdsTime = rx.getRdsTime();  // Si besoin de mettre à jour l’heure RDS
+
+    // Mise à jour du message RDS
+    if (newRdsMsg != NULL)
     {
-      rdsMsg = rx.getRdsText2A();
-      stationName = rx.getRdsText0A();
-      rdsTime = rx.getRdsTime();
-      
-      if ( rdsMsg != NULL )   
+      // Si le message a changé, on le recopie et on met à jour l’affichage
+      if (strcmp(bufferRdsMsg, newRdsMsg) != 0)
+      {
+        strcpy(bufferRdsMsg, newRdsMsg);
         showRDSMsg();
-      if (stationName != NULL)
+      }
+    }
+    else
+    {
+      // Si le nouveau message est NULL et que le buffer n'est pas vide, on l’efface
+      if (strlen(bufferRdsMsg) > 0)
+      {
+        bufferRdsMsg[0] = '\0';
+        showRDSMsg();
+      }
+    }
+
+    // Même démarche pour le nom de la station
+    if (newStationName != NULL)
+    {
+      if (strcmp(bufferStationName, newStationName) != 0)
+      {
+        strcpy(bufferStationName, newStationName);
         showRDSStation();
-      //if (rdsTime != NULL) showRDSTime();
+      }
+    }
+    else
+    {
+      if (strlen(bufferStationName) > 0)
+      {
+        bufferStationName[0] = '\0';
+        showRDSStation();
+      }
+    }
+  }
+  else
+  {
+    // Aucun RDS reçu (par exemple lors du changement de station) : on vide les buffers
+    if (strlen(bufferRdsMsg) > 0 || strlen(bufferStationName) > 0)
+    {
+      cleanBfoRdsInfo();  // Assurez-vous que cette fonction vide aussi bufferRdsMsg.
+      showRDSMsg();
+      showRDSStation();
     }
   }
 }
+
 
 
 void checkCBChannel()
