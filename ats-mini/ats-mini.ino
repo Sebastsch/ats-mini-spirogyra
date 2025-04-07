@@ -3,14 +3,14 @@
 // =================================
 
 #include <Wire.h>
-#include <TFT_eSPI.h>               // https://github.com/Xinyuan-LilyGO/T-Display-S3#quick-start
+#include <TFT_eSPI.h>              // https://github.com/Xinyuan-LilyGO/T-Display-S3#quick-start
 #include "EEPROM.h"
 #include <SI4735.h>
 #include "Rotary.h"                // Disabled half-step mode
 #include "patch_init.h"            // SSB patch for whole SSBRX initialization string
-#include "poxel_font16pt7b.h"      //Font1 Band
-#include "Technology10pt7b.h"       //Font2 RDS Station
-#include "PixelOperator8p.h"      //Font3 RDS Message
+#include "poxel_font16pt7b.h"      // Font1 Band display
+#include "Technology10pt7b.h"      // Font2 RDS Station
+#include "PixelOperator8p.h"       // Font3 RDS Message
 
 
 // =================================
@@ -66,8 +66,8 @@
 #define menu_delta_x    10    // Menu width delta
 #define meter_offset_x   2    // Meter horizontal offset
 #define meter_offset_y   2    // Meter vertical offset
-#define save_offset_x   300    // EEPROM save icon horizontal offset
-#define save_offset_y   120    // EEPROM save icon vertical offset
+#define save_offset_x  300    // EEPROM save icon horizontal offset
+#define save_offset_y  118    // EEPROM save icon vertical offset
 #define freq_offset_x  250    // Frequency horizontal offset
 #define freq_offset_y   65    // Frequency vertical offset
 #define funit_offset_x 255    // Frequency Unit horizontal offset
@@ -2197,58 +2197,40 @@ void drawSprite()
       spr.drawString(bfo,80,158,4);
     }
 
-
-
-    // --- Nouvelle version du S-mètre ---
-// Affiche une barre de signal de 100 pixels de large par 4 pixels de haut,
-// avec en dessous la chaîne "1•3•5•7•9•+10•+20•+30"
-
-// Dimensions de la barre
-int barWidth  = 100;  // largeur maximale
-int barHeight = 4;    // hauteur de la barre
-
-// Position d'affichage (ajustez meter_offset_x et meter_offset_y si besoin)
+    // --- New Version of the S-Meter ---
+    
+int barWidth  = 100;  // maximum width
+int barHeight = 4;    // bar height
+    
 int barX = meter_offset_x;
 int barY = meter_offset_y;
 
-// Dessiner le contour de la barre
-//spr.drawRect(barX, barY, barWidth, barHeight, theme[themeIdx].smeter_icon);
-
-// Calcul de la force du signal (getStrength() retourne une valeur entre 1 et 17)
 int strength = getStrength();
-// Mappage linéaire de [1, 17] vers [0, 100] pixels
 int fillWidth = ((strength - 1) * barWidth) / 16;
-
-// Remplir la barre (décalage de 1 pixel pour tenir compte du contour)
+    
 spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
-
-// Afficher la légende en dessous
 const char* labelText = "1•3•5•7•9•+10•+20•+30";
 
-// On détermine la largeur du texte et on le centre par rapport à la barre
 spr.setFreeFont(&PixelOperator8pt7b);
 spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
 int labelWidth = spr.textWidth(labelText);
 int labelX = barX + (barWidth - labelWidth) / 2;
-int labelY = barY + barHeight + 4; // un petit espace sous la barre
-
-// Utiliser un facteur d'échelle (ici : 1)
+int labelY = barY + barHeight + 4;
 spr.drawString(labelText, labelX, labelY, 1);
 
     
     
 
-
-    // S-Meter
-   // spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
-   // spr.drawLine(meter_offset_x + 6, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 14, theme[themeIdx].smeter_icon);
- //   for(int i=0; i<getStrength(); i++) {
- //     if (i<10) {
- //       spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar);
-//      } else {
-//        spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar_plus);
- //     }
- //   }
+// S-Meter  
+// spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
+// spr.drawLine(meter_offset_x + 6, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 14, theme[themeIdx].smeter_icon);
+// for(int i=0; i<getStrength(); i++) {
+//   if (i<10) {
+//     spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar);
+//    } else {
+//      spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar_plus);
+//     }
+//   }
 
     
     //Icone Stereo
@@ -2278,48 +2260,40 @@ if (currentMode == FM) {
   spr.setFreeFont(&PixelOperator8pt7b);
   spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
 
-  const int max_line_len = 30; // Nombre maximum de caractères par ligne
+  const int max_line_len = 30;
   char line1[max_line_len + 1];
   char line2[max_line_len + 1];
 
   int len = strlen(bufferRdsMsg);
-
-  // Si le message tient sur une seule ligne, pas de découpage nécessaire
+  
   if (len <= max_line_len) {
     strncpy(line1, bufferRdsMsg, max_line_len);
     line1[len] = '\0';
     line2[0] = '\0';
   } else {
-    // Chercher le dernier espace dans la portion de texte destinée à la première ligne
     int breakIndex = max_line_len;
     while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
       breakIndex--;
     }
-    
-    // Si aucun espace n'est trouvé, on garde la coupure fixe
     if (breakIndex == 0) {
       breakIndex = max_line_len;
     }
-    
-    // Copie de la première ligne jusqu'au point de découpe
+  
     strncpy(line1, bufferRdsMsg, breakIndex);
     line1[breakIndex] = '\0';
     
-    // Sauter les espaces en début de la seconde ligne
     int startSecondLine = breakIndex;
     while (bufferRdsMsg[startSecondLine] == ' ' && startSecondLine < len) {
       startSecondLine++;
     }
     
-    // Copier le reste pour la deuxième ligne, avec une limite
     strncpy(line2, bufferRdsMsg + startSecondLine, max_line_len);
     line2[max_line_len] = '\0';
   }
-
-  // Affichage des lignes
+  
   spr.drawString(line1, rdsmess_offset_x, rdsmess_offset_y);
   if (strlen(line2) > 0) {
-    int lineSpacing = 13; // Ajustez en fonction de la hauteur de la police
+    int lineSpacing = 13;
     spr.drawString(line2, rdsmess_offset_x, rdsmess_offset_y + lineSpacing);
   }
 }
@@ -2385,6 +2359,15 @@ void cleanBfoRdsInfo()
   bufferStationName[0]='\0';
 }
 
+void showRDSStation()
+{
+  rdsStation[15] = bufferRdsStation[15] = '\0';
+  if (strcmp(bufferStationName, stationName) == 0 ) return;
+  cleanBfoRdsInfo();
+  strcpy(bufferStationName, stationName);
+  drawSprite();
+}
+
 void showRDSMsg()
 {
   rdsMsg[60] = bufferRdsMsg[60] = '\0';
@@ -2394,28 +2377,16 @@ void showRDSMsg()
   drawSprite();
 }
 
-void showRDSStation()
-{
-  if (strcmp(bufferStationName, stationName) == 0 ) return;
-  cleanBfoRdsInfo();
-  strcpy(bufferStationName, stationName);
-  drawSprite();
-}
-
 //void showRDSTime()
 //{
 //  if (strcmp(bufferRdsTime, rdsTime) == 0)
 //    return;
-
 //  if (snr < 12) return; // Do not synchronize if the signal is weak
-
-  // Copy new RDS time to buffer
+// Copy new RDS time to buffer
 //  strcpy(bufferRdsTime, rdsTime);
-  
-  // Synchronize internal time with RDS time
+// Synchronize internal time with RDS time
 //  syncTimeFromRDS(rdsTime);
-  
-  // Display updated time (optional)
+// Display updated time (optional)
 //  drawSprite();
 //}
 
