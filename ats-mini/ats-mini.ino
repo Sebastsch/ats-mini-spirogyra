@@ -3051,14 +3051,18 @@ void getColorTheme() {
 void loop() {
 
 
-// Détection d'une interaction par l'encodeur : s'il y a rotation, on réactive le rétroéclairage.
+// Supposons que defaultBrt contienne la valeur de départ ou celle issue de l'EEPROM.
+const uint16_t defaultBrt = 128; // Exemple de valeur par défaut
+
+// Dans la détection d'interaction :
 if (encoderCount != 0 && display_on) {
   if (isDimmed) {
     isDimmed = false;
-    // Augmente la luminosité d'un pas (la fonction doBrt(1) augmente currentBrt de 32, avec plafonnement à 255)
-    doBrt(1);
+    // Restaurer complètement la luminosité au lieu de l'incrémenter d'un simple palier.
+    currentBrt = defaultBrt;
+    ledcWrite(PIN_LCD_BL, currentBrt);
+    showBrt();
   }
-  // Réinitialise le timer de veille dès qu'une interaction est détectée.
   elapsedSleep = millis();
 }
 
@@ -3285,15 +3289,14 @@ if (encoderCount != 0 && display_on) {
 // Gestion du timeout de veille : diminuer le rétroéclairage au lieu d'éteindre l'écran
 if (currentSleep && display_on) {
   if ((millis() - elapsedSleep) > currentSleep * 1000) {
-    // Si la luminosité est supérieure au seuil minimal (ici 32), la diminuer par paliers
     if (currentBrt > 12) {
-      doBrt(0);  // Appel avec argument 0 diminue currentBrt par 32 (ou 31 si currentBrt == 255)
-      isDimmed = true;  // On note qu'on est en mode "dim"
-      delay(100);  // Petite pause pour obtenir l'effet progressif (ajustez si besoin)
+      doBrt(0);      // diminue currentBrt par un pas (32 ou 31 points)
+      isDimmed = true;
+      delay(100);
     }
-    // Sinon, vous pouvez laisser currentBrt à sa valeur minimale (32)
   }
 }
+
 
 
 
