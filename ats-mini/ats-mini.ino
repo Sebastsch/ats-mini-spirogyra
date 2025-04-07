@@ -2385,18 +2385,16 @@ void cleanBfoRdsInfo()
 
 void showRDSMsg()
 {
- // rdsMsg[60] = bufferRdsMsg[60] = '\0';
-  if (strcmp(bufferRdsMsg, rdsMsg) == 0)
-    return;
-    cleanBfoRdsInfo();
+  rdsMsg[60] = bufferRdsMsg[60] = '\0';
+  if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
+  cleanBfoRdsInfo();
   strcpy(bufferRdsMsg, rdsMsg);
   drawSprite();
 }
 
 void showRDSStation()
 {
-  if (strcmp(bufferStationName, stationName) == 0 ) 
-    return;
+  if (strcmp(bufferStationName, stationName) == 0 ) return;
   cleanBfoRdsInfo();
   strcpy(bufferStationName, stationName);
   drawSprite();
@@ -2605,7 +2603,7 @@ void batteryMonitor() {
     char voltage[8];
     spr.fillRoundRect(batt_offset_x + 2, batt_offset_y + 3, chargeLevel, 10, 2, batteryLevelColor);
     sprintf(voltage, "%.02fV", adc_volt_avr);
-    spr.drawString(voltage, batt_offset_x - 3, batt_offset_y, 2);
+    //spr.drawString(voltage, batt_offset_x - 3, batt_offset_y, 2);
   }
 }
 
