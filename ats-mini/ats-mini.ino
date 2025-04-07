@@ -3291,6 +3291,8 @@ if (currentSleep && display_on) {
       isDimmed = true;  // On note qu'on est en mode "dim"
       delay(100);  // Petite pause pour obtenir l'effet progressif (ajustez si besoin)
     }
+    else
+      ledcWrite(PIN_LCD_BL, currentBrt)
     // Sinon, vous pouvez laisser currentBrt à sa valeur minimale (32)
   }
 }
