@@ -66,7 +66,7 @@
 #define menu_delta_x    10    // Menu width delta
 #define meter_offset_x   2    // Meter horizontal offset
 #define meter_offset_y   2    // Meter vertical offset
-#define save_offset_x   310    // EEPROM save icon horizontal offset
+#define save_offset_x   300    // EEPROM save icon horizontal offset
 #define save_offset_y   120    // EEPROM save icon vertical offset
 #define freq_offset_x  250    // Frequency horizontal offset
 #define freq_offset_y   65    // Frequency vertical offset
@@ -2381,7 +2381,6 @@ if (currentMode == FM) {
 void cleanBfoRdsInfo()
 {
   bufferStationName[0]='\0';
-  bufferRdsMsg[0] = '\0';
 }
 
 void showRDSMsg()
@@ -2424,8 +2423,8 @@ void showRDSStation()
 void checkRDS()
 {
   rx.getRdsStatus();
-  if (rx.getRdsReceived())
-  {
+  //if (rx.getRdsReceived())
+  //{
     if (rx.getRdsSync() && rx.getRdsSyncFound())
     {
       rdsMsg = rx.getRdsText2A();
