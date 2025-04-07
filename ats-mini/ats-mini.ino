@@ -66,8 +66,8 @@
 #define menu_delta_x    10    // Menu width delta
 #define meter_offset_x   2    // Meter horizontal offset
 #define meter_offset_y   2    // Meter vertical offset
-#define save_offset_x   300    // EEPROM save icon horizontal offset
-#define save_offset_y   125    // EEPROM save icon vertical offset
+#define save_offset_x   310    // EEPROM save icon horizontal offset
+#define save_offset_y   120    // EEPROM save icon vertical offset
 #define freq_offset_x  250    // Frequency horizontal offset
 #define freq_offset_y   65    // Frequency vertical offset
 #define funit_offset_x 255    // Frequency Unit horizontal offset
@@ -2385,7 +2385,7 @@ void cleanBfoRdsInfo()
 
 void showRDSMsg()
 {
-  rdsMsg[60] = bufferRdsMsg[60] = '\0';
+ // rdsMsg[60] = bufferRdsMsg[60] = '\0';
   if (strcmp(bufferRdsMsg, rdsMsg) == 0)
     return;
     cleanBfoRdsInfo();
@@ -2395,7 +2395,8 @@ void showRDSMsg()
 
 void showRDSStation()
 {
-  if (strcmp(bufferStationName, stationName) == 0 ) return;
+  if (strcmp(bufferStationName, stationName) == 0 ) 
+    return;
   cleanBfoRdsInfo();
   strcpy(bufferStationName, stationName);
   drawSprite();
@@ -2600,12 +2601,12 @@ void batteryMonitor() {
     spr.fillRect(batt_offset_x + 9 + 1, batt_offset_y + 1 + 6, 9, 2, theme[themeIdx].batt_icon);
     spr.drawPixel(batt_offset_x + 9 + 3, batt_offset_y + 1 + 12, theme[themeIdx].batt_icon);
   } 
-  else {
-    char voltage[8];
-    spr.fillRoundRect(batt_offset_x + 2, batt_offset_y + 3, chargeLevel, 10, 2, batteryLevelColor);
-    sprintf(voltage, "%.02fV", adc_volt_avr);
-    spr.drawString(voltage, batt_offset_x - 3, batt_offset_y, 2);
-  }
+ // else {
+ //   char voltage[8];
+ //   spr.fillRoundRect(batt_offset_x + 2, batt_offset_y + 3, chargeLevel, 10, 2, batteryLevelColor);
+ //   sprintf(voltage, "%.02fV", adc_volt_avr);
+ //   spr.drawString(voltage, batt_offset_x - 3, batt_offset_y, 2);
+ // }
 }
 
 
