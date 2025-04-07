@@ -3286,13 +3286,11 @@ if (encoderCount != 0 && display_on) {
 if (currentSleep && display_on) {
   if ((millis() - elapsedSleep) > currentSleep * 1000) {
     // Si la luminosité est supérieure au seuil minimal (ici 32), la diminuer par paliers
-    if (currentBrt > 32) {
+    if (currentBrt > 12) {
       doBrt(0);  // Appel avec argument 0 diminue currentBrt par 32 (ou 31 si currentBrt == 255)
       isDimmed = true;  // On note qu'on est en mode "dim"
       delay(100);  // Petite pause pour obtenir l'effet progressif (ajustez si besoin)
     }
-    else
-      ledcWrite(PIN_LCD_BL, currentBrt)
     // Sinon, vous pouvez laisser currentBrt à sa valeur minimale (32)
   }
 }
