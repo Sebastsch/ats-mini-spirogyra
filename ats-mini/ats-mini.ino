@@ -2361,16 +2361,16 @@ void cleanBfoRdsInfo()
 
 void showRDSStation()
 {
-  rdsStation[15] = bufferRdsStation[15] = '\0';
+  rdsStation[50] = bufferStationName[50] = '\0';
   if (strcmp(bufferStationName, stationName) == 0 ) return;
   cleanBfoRdsInfo();
-  strcpy(bufferStationName, stationName);
+  strcpy(bufferStationName, rdsStation);
   drawSprite();
 }
 
 void showRDSMsg()
 {
-  rdsMsg[60] = bufferRdsMsg[60] = '\0';
+  rdsMsg[100] = bufferRdsMsg[100] = '\0';
   if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
   cleanBfoRdsInfo();
   strcpy(bufferRdsMsg, rdsMsg);
