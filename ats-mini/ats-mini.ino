@@ -3317,7 +3317,8 @@ void loop() {
       showVolume();
       delay(MIN_ELAPSED_TIME); // waits a little more for releasing the button.
       elapsedSleep = elapsedCommand = millis();
-   } else if (pb1_released && !pb1_long_released && !seekModePress) {
+   } 
+    else if (pb1_released && !pb1_long_released && !seekModePress) {
   pb1_released = pb1_short_released = pb1_long_released = false;
   if (cmdEco) {
     // Si Eco mode est actif, lance la procédure de power off.
@@ -3355,7 +3356,9 @@ void loop() {
   }
   delay(MIN_ELAPSED_TIME); // Pour le debounce
   elapsedSleep = elapsedCommand = millis();
-}
+    }
+  }
+    
 
   // Display sleep timeout
   if (currentSleep && display_on) {
