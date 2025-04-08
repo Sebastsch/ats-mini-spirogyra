@@ -2765,17 +2765,18 @@ void showSleep() {
 
 
 
-void doEco( uint16_t v ) {
-  if ( v == 1 ) {
-    currentEco = currentEco + 30;
-    if (currentEco > 280) currentEco = 280;
-  } else {
+void doEcoMode(uint16_t v) {
+  if (v == 1) {                   // Incrémentation : encoder vers le haut
+    currentEco += 30;
+    if (currentEco > 280)
+      currentEco = 280;
+  } else {                        // Décrémentation : encoder vers le bas
     if (currentEco > 30)
-      currentEco = currentEco - 30;
+      currentEco -= 30;
     else
       currentEco = 30;
   }
-  showEco();
+  showEco();  // Met à jour l'affichage Eco Mode
 }
 
 void showEco() {
