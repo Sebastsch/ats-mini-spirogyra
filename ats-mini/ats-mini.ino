@@ -2972,7 +2972,7 @@ void powerOff() {
   delay(1000);
   // Passage en deep sleep (arrêt complet)
   esp_deep_sleep_start();
-
+}
 
 void captureScreen() {
   uint16_t width = spr.width(), height = spr.height();
