@@ -3269,12 +3269,12 @@ void loop() {
     } 
     
     
-    else if (cmdEco) {
-      doEcoMode(encoderCount);
-      encoderCount = 0;
-      resetEepromDelay();
-      elapsedSleep = elapsedCommand = millis();
-    }
+//    else if (cmdEco) {
+//      doEcoMode(encoderCount);
+//      encoderCount = 0;
+//      resetEepromDelay();
+//)      elapsedSleep = elapsedCommand = millis();
+//   }
     
     
     
