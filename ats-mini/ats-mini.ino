@@ -586,6 +586,10 @@ bool isCB() {
 }
 
 
+
+void doEcoMode(uint16_t v);
+
+
 // Generation of step value
 int getSteps(bool fast = false) {
   if (isSSB()) {
