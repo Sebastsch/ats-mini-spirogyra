@@ -283,15 +283,15 @@ uint16_t currentSleep = 30;             // Display sleep timeout, range = 0 to 2
 long elapsedSleep = millis();           // Display sleep timer
 
 
-// Menu options
-int16_t currentCAL = 0;                 // Calibration offset, +/- 1000Hz in steps of 10Hz
-uint16_t currentBrt = 128;              // Display brightness, range = 32 to 255 in steps of 32
-int8_t currentAVC = 48;                 // Selected AVC, range = 12 to 90 in steps of 2
-uint16_t currentSleep = 30;             // Display sleep timeout, range = 0 to 255 in steps of 5
 
-// Paramètre pour Eco Mode (en minutes)
-// On part de 30 minutes et on ajoute par paliers de 30 jusqu’à 280 minutes.
-uint16_t currentEco = 30;               // Valeur actuelle en minutes
+
+uint16_t currentSleep = 30; // Temps d’attente pour le Sleep en minutes
+
+// Option Eco Mode : à partir de 30, incrémenté par 30 minutes, avec une limite maximum (ici, 280 minutes)
+uint16_t currentEco = 30;   // Valeur initiale en minutes pour le mode Eco
+// Variables globales pour Eco Mode
+bool ecoModeEnabled = false;       // Etat du mode Eco (désactivé par défaut)
+unsigned long ecoStartTime = 0;    // Pour stocker le timestamp du démarrage du mode Eco
 
 
 // Background screen refresh
