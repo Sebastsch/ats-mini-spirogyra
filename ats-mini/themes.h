@@ -446,7 +446,7 @@ const ColorTheme theme[] = {
     0x4D15, // Ster_icon
     0x4D15, // Mono_icon
     0xDEFA, // band_text
-    0x4D15, // mode_text
+    0xDEFA, // mode_text
     0x4083, // mode_border
     0x2A2C, // box_bg
     0x2A2C, // box_border
@@ -455,7 +455,7 @@ const ColorTheme theme[] = {
     0xDEFA, // box_off_text
     0x2A2C, // menu_bg
     0x2A2C, // menu_border
-    0xFAE8, // menu_hdr
+    0xFDE8, // menu_hdr
     0x4D15, // menu_item
     0x2A2C, // menu_hl_bg
     0xFDE8, // menu_hl_text
