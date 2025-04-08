@@ -284,9 +284,6 @@ long elapsedSleep = millis();           // Display sleep timer
 
 
 
-
-uint16_t currentSleep = 30; // Temps d’attente pour le Sleep en minutes
-
 // Option Eco Mode : à partir de 30, incrémenté par 30 minutes, avec une limite maximum (ici, 280 minutes)
 uint16_t currentEco = 30;   // Valeur initiale en minutes pour le mode Eco
 // Variables globales pour Eco Mode
