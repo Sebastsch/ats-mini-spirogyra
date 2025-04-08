@@ -7,7 +7,6 @@
 #include "EEPROM.h"
 #include <SI4735.h>
 #include "Rotary.h"                // Disabled half-step mode
-#include "esp_sleep.h"
 #include "patch_init.h"            // SSB patch for whole SSBRX initialization string
 #include "poxel_font16pt7b.h"      // Font1 Band display
 #include "Technology10pt7b.h"      // Font2 RDS Station
@@ -153,7 +152,6 @@
 #define MENU_SLEEP        1
 #define MENU_THEME        2
 #define MENU_ABOUT        3
-#define MENU_ECOMODE      4
 
 #define EEPROM_SIZE     512
 #define STORE_TIME    10000                  // Time of inactivity to make the current receiver status writable (10s)
@@ -207,7 +205,6 @@ bool cmdAvc = false;
 bool cmdSettings = false;
 bool cmdBrt = false;
 bool cmdSleep = false;
-bool cmdEco = false;
 bool cmdTheme = false;
 bool cmdAbout = false;
 
@@ -282,16 +279,6 @@ int8_t currentAVC = 48;                 // Selected AVC, range = 12 to 90 in ste
 uint16_t currentSleep = 30;             // Display sleep timeout, range = 0 to 255 in steps of 5
 long elapsedSleep = millis();           // Display sleep timer
 
-
-
-
-uint8_t ecoModeIdx = 0;
-const uint16_t ecoModes[] = {30, 60, 90, 120, 150, 180}; // Durées en minutes
-const uint8_t ecoModeCount = sizeof(ecoModes) / sizeof(ecoModes[0]);
-uint16_t ecomode_duration = ecoModes[ecoModeIdx];  // Durée par défaut : 30 minutes
-
-
-
 // Background screen refresh
 uint32_t background_timer = millis();   // Background screen refresh timer.
 uint32_t tuning_timer = millis();       // Tuning hold off timer.
@@ -360,24 +347,12 @@ int8_t menuIdx = MENU_VOLUME;
 const int lastMenu = (sizeof menu / sizeof(char *)) - 1;
 int8_t currentMenuCmd = -1;
 
-//const char *settingsMenu[] = {
-//  "Brightness",
-//  "Sleep",
-//  "Theme",
-//  "About",
-//};
-
 const char *settingsMenu[] = {
   "Brightness",
   "Sleep",
   "Theme",
   "About",
-  "Eco mode"
 };
-
-
-
-
 
 int8_t settingsMenuIdx = MENU_BRIGHTNESS;
 const int lastSettingsMenu = (sizeof settingsMenu / sizeof(char *)) - 1;
@@ -1813,73 +1788,35 @@ void doCurrentMenuCmd() {
 /**
  * Starts the SETTINGS action process
  */
-//void doCurrentSettingsMenuCmd() {
-//  disableCommands();
-//  switch (currentSettingsMenuCmd) {
-//  case MENU_BRIGHTNESS:
-//      cmdBrt = true;
-//      showBrt();
-//      break;
-
-//  case MENU_SLEEP:
-//      cmdSleep = true;
-//     showSleep();
-//      break;
-
-//  case MENU_THEME:
-//      cmdTheme = true;
-//      showTheme();
-//      break;
-
-//  case MENU_ABOUT:
-//      cmdAbout = true;
-//      showAbout();
-//      break;
-
-//  default:
-//      showStatus();
-//      break;
-//  }
-//  currentSettingsMenuCmd = -1;
-//}
-
-
-
 void doCurrentSettingsMenuCmd() {
   disableCommands();
   switch (currentSettingsMenuCmd) {
-    case MENU_BRIGHTNESS:
+  case MENU_BRIGHTNESS:
       cmdBrt = true;
       showBrt();
       break;
-    case MENU_SLEEP:
+
+  case MENU_SLEEP:
       cmdSleep = true;
       showSleep();
       break;
-    case MENU_THEME:
+
+  case MENU_THEME:
       cmdTheme = true;
       showTheme();
       break;
-    case MENU_ABOUT:
+
+  case MENU_ABOUT:
       cmdAbout = true;
       showAbout();
       break;
-    case MENU_ECOMODE:
-      cmdEco = true;
-      showEco();
-      break;
-    default:
+
+  default:
       showStatus();
       break;
   }
   currentSettingsMenuCmd = -1;
 }
-
-
-
-
-
-
 
 
 uint8_t getStrength() {
@@ -2081,14 +2018,6 @@ void drawMenu() {
       spr.setTextColor(theme[themeIdx].menu_param,theme[themeIdx].menu_bg);
       spr.fillRoundRect(6+menu_offset_x,24+menu_offset_y+(2*16),66+menu_delta_x,16,2,theme[themeIdx].menu_bg);
       spr.drawNumber(currentSleep,40+menu_offset_x+(menu_delta_x/2),60+menu_offset_y,4);
-    }
-
-    if (cmdEco) {
-      spr.setTextColor(theme[themeIdx].menu_param, theme[themeIdx].menu_bg);
-      spr.fillRoundRect(6+menu_offset_x, 24+menu_offset_y+(2*16), 66+menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
-      char ecoStr[10];
-      sprintf(ecoStr, "%dmin", ecoModes[ecoModeIdx]);
-      spr.drawString(ecoStr, 40+menu_offset_x+(menu_delta_x/2), 60+menu_offset_y, 4);
     }
   }
 }
@@ -2810,62 +2739,6 @@ void showSleep() {
   drawSprite();
 }
 
-
-
-// Permet de faire défiler les différentes durées Eco mode
-void doEco(int16_t v) {
-  if (v == 1) {
-    ecoModeIdx++;
-    if (ecoModeIdx >= ecoModeCount)
-      ecoModeIdx = 0;
-  } 
-  else if (v == -1) {
-    if (ecoModeIdx == 0)
-      ecoModeIdx = ecoModeCount - 1;
-    else
-      ecoModeIdx--;
-  }
-  ecomode_duration = ecoModes[ecoModeIdx];
-  showEco();
-}
-
-// Affiche l'option Eco mode dans le menu (par exemple "Eco: 90min")
-void showEco() {
-  // On redessine l'écran pour mettre à jour l'affichage de la commande
-  drawSprite();
-  spr.setTextColor(theme[themeIdx].menu_param, theme[themeIdx].menu_bg);
-  spr.fillRoundRect(6 + menu_offset_x, 24 + menu_offset_y + (2 * 16),
-                    66 + menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
-  char ecoStr[10];
-  sprintf(ecoStr, "%dmin", ecomode_duration);
-  spr.drawString(ecoStr, 40 + menu_offset_x + (menu_delta_x / 2),
-                 60 + menu_offset_y, 4);
-  spr.pushSprite(0, 0);
-}
-
-
-// Active l'Eco mode : l'ESP32 est mis en deep sleep avec réveil automatique après ecomode_duration minutes.
-// Cette fonction est analogue à celle de Sleep.
-void activateEcoMode() {
-  // Désactive l'affichage (fonction existante)
-  displayOff();
-
-  Serial.printf("Eco mode activé : Deep Sleep pour %d minutes...\n", ecomode_duration);
-  delay(100);  // Laisser le temps d'envoyer le message sur Serial
-
-  // Configure le timer de réveil pour ecomode_duration minutes (conversion en µs)
-  esp_sleep_enable_timer_wakeup((uint64_t)ecomode_duration * 60ULL * 1000000ULL);
-
-  // Entre en deep sleep et redémarre dès le réveil
-  esp_deep_sleep_start();
-}
-
-
-
-
-
-
-
 void doTheme( uint16_t v ) {
   if (v == 1)
     themeIdx = (themeIdx < lastTheme) ? (themeIdx + 1) : 0;
@@ -3212,8 +3085,6 @@ void loop() {
       doBrt(encoderCount);
     else if (cmdSleep)
       doSleep(encoderCount);
-    else if (cmdEco)
-      doEco(encoderCount);
     else if (cmdTheme)
       doTheme(encoderCount);
     else if (cmdAbout) {}
@@ -3305,45 +3176,60 @@ void loop() {
     encoderCount = 0;
     resetEepromDelay();
     elapsedSleep = elapsedCommand = millis();
-  } 
-  else if (pb1_released && !pb1_long_released && !seekModePress) {
-      pb1_released = pb1_short_released = pb1_long_released = false;
-      if (cmdEco) {
-        activateEcoMode();
+  } else {
+    if (pb1_long_pressed && !seekModePress) {
+      pb1_long_pressed = pb1_short_pressed = pb1_pressed = false;
+      if (display_on) {
+        displayOff();
+      } else {
+        displayOn();
       }
-      else if (!display_on) {
+      elapsedSleep = millis();
+    } else if (pb1_short_released && display_on && !seekModePress) {
+      pb1_released = pb1_short_released = pb1_long_released = false;
+      if (muted) {
+        rx.setVolume(mute_vol_val);
+        muted = false;
+      }
+      disableCommands();
+      cmdVolume = true;
+      menuIdx = MENU_VOLUME;
+      showVolume();
+      delay(MIN_ELAPSED_TIME); // waits a little more for releasing the button.
+      elapsedSleep = elapsedCommand = millis();
+   } else if (pb1_released && !pb1_long_released && !seekModePress) {
+      pb1_released = pb1_short_released = pb1_long_released = false;
+      if (!display_on) {
         if (currentSleep) {
           displayOn();
         }
-      }
-      else if (cmdMenu) {
+      } else if (cmdMenu) {
         currentMenuCmd = menuIdx;
         doCurrentMenuCmd();
-      }
-      else if (cmdSettings) {
+      } else if (cmdSettings) {
         currentSettingsMenuCmd = settingsMenuIdx;
         doCurrentSettingsMenuCmd();
-      }
-      else {
+      } else {
         if (isModalMode()) {
           disableCommands();
           showStatus();
           showCommandStatus((char *)"VFO ");
-        }
-        else if (bfoOn) {
+        } else if (bfoOn) {
           bfoOn = false;
           showStatus();
-        }
-        else {
+        } else {
           cmdMenu = !cmdMenu;
+          // menuIdx = MENU_VOLUME;
           currentMenuCmd = menuIdx;
+          // settingsMenuIdx = MENU_BRIGHTNESS;
+          currentSettingsMenuCmd = settingsMenuIdx;
           drawSprite();
         }
       }
-    delay(MIN_ELAPSED_TIME);
-    elapsedSleep = elapsedCommand = millis();
+      delay(MIN_ELAPSED_TIME); // waits a little more for releasing the button.
+      elapsedSleep = elapsedCommand = millis();
+    }
   }
-    
 
   // Display sleep timeout
   if (currentSleep && display_on) {
