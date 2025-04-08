@@ -283,12 +283,15 @@ uint16_t currentSleep = 30;             // Display sleep timeout, range = 0 to 2
 long elapsedSleep = millis();           // Display sleep timer
 
 
-// Ajoutez ces définitions dans la section globale (auparavant d’autres variables similaires)
-const uint16_t EcoIntervals[6] = {30, 60, 90, 120, 150, 180}; // en minutes
-uint8_t ecoModeIndex = 0;
-uint16_t currentEcoInterval = EcoIntervals[0]; // Valeur par défaut : 30 minutes
-bool ecoModeEnabled = false;  // Mode Eco activé ou non
-uint32_t ecoStartTime = 0;    // Horodatage du démarrage de la minuterie Eco Mode
+// Menu options
+int16_t currentCAL = 0;                 // Calibration offset, +/- 1000Hz in steps of 10Hz
+uint16_t currentBrt = 128;              // Display brightness, range = 32 to 255 in steps of 32
+int8_t currentAVC = 48;                 // Selected AVC, range = 12 to 90 in steps of 2
+uint16_t currentSleep = 30;             // Display sleep timeout, range = 0 to 255 in steps of 5
+
+// Paramètre pour Eco Mode (en minutes)
+// On part de 30 minutes et on ajoute par paliers de 30 jusqu’à 280 minutes.
+uint16_t currentEco = 30;               // Valeur actuelle en minutes
 
 
 // Background screen refresh
@@ -2760,27 +2763,33 @@ void showSleep() {
 
 
 
-// Fonction d'ajustement Eco Mode, similaire à doSleep()
-void doEcoMode( uint16_t v ) {
+void doEco( uint16_t v ) {
   if ( v == 1 ) {
-    ecoModeIndex++;                   // Passage à l'option supérieure
-    if ( ecoModeIndex > 5 ) ecoModeIndex = 0; // Bouclage en fin de tableau
+    currentEco = currentEco + 30;
+    if (currentEco > 280) currentEco = 280;
   } else {
-    if ( ecoModeIndex == 0 ) ecoModeIndex = 5;  // Bouclage vers la dernière valeur
-    else ecoModeIndex--;              // Passage à l'option inférieure
+    if (currentEco > 30)
+      currentEco = currentEco - 30;
+    else
+      currentEco = 30;
   }
-  currentEcoInterval = EcoIntervals[ecoModeIndex]; // Mise à jour de l'intervalle courant
   showEco();
 }
 
-// Fonction d'affichage Eco Mode (similaire à showSleep)
 void showEco() {
-  // Ici, le simple rafraîchissement avec drawSprite()
-  // Vous pouvez, par exemple, ajouter du texte pour indiquer "Eco: XX min"
-  drawSprite();
+  // Vous pouvez ajouter un affichage personnalisé, par exemple :
+  if (display_on) {
+    spr.setTextDatum(MC_DATUM);
+    // Exemple d’affichage similaire à showSleep():
+    spr.fillSmoothRoundRect(6 + menu_offset_x, 24 + menu_offset_y + (2 * 16),
+                            66 + menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
+    // Affiche la valeur Eco (en minutes) au centre
+    spr.drawNumber(currentEco, 40 + menu_offset_x + (menu_delta_x / 2),
+                   60 + menu_offset_y, 4);
+    // Rafraîchit l’affichage
+    drawSprite();
+  }
 }
-
-
 
 
 
