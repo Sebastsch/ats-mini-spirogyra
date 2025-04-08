@@ -8,6 +8,7 @@
 #include <SI4735.h>
 #include "Rotary.h"                // Disabled half-step mode
 #include "patch_init.h"            // SSB patch for whole SSBRX initialization string
+#include "esp_sleep.h"             // Assurez-vous que cette inclusion est présente en début de fichier
 #include "poxel_font16pt7b.h"      // Font1 Band display
 #include "Technology10pt7b.h"      // Font2 RDS Station
 #include "PixelOperator8p.h"       // Font3 RDS Message
@@ -150,8 +151,9 @@
 // Settings Options
 #define MENU_BRIGHTNESS   0
 #define MENU_SLEEP        1
-#define MENU_THEME        2
-#define MENU_ABOUT        3
+#define MENU_ECO          2
+#define MENU_THEME        3
+#define MENU_ABOUT        4
 
 #define EEPROM_SIZE     512
 #define STORE_TIME    10000                  // Time of inactivity to make the current receiver status writable (10s)
@@ -205,6 +207,7 @@ bool cmdAvc = false;
 bool cmdSettings = false;
 bool cmdBrt = false;
 bool cmdSleep = false;
+bool cmdEco = false;
 bool cmdTheme = false;
 bool cmdAbout = false;
 
@@ -290,6 +293,19 @@ uint16_t adc_read_avr;                  // Average ADC count = adc_read_total / 
 float adc_volt_avr;                     // Average ADC voltage with correction
 uint8_t batt_soc_state = 255;           // State machine used for battery state of charge (SOC) detection with hysteresis (Default = Illegal state)
 
+
+
+// Eco Mode
+const uint16_t EcoIntervals[6] = {30, 60, 90, 120, 150, 180}; // en minutes
+uint8_t ecoModeIndex = 0;
+uint16_t currentEcoInterval = EcoIntervals[0]; // Valeur par défaut : 30 minutes
+bool ecoModeEnabled = false;  // Mode Eco activé ou non
+uint32_t ecoStartTime = 0;    // Horodatage du démarrage de la minuterie Eco Mode
+
+
+
+
+
 // Time
 uint32_t clock_timer = 0;
 uint8_t time_seconds = 0;
@@ -350,6 +366,7 @@ int8_t currentMenuCmd = -1;
 const char *settingsMenu[] = {
   "Brightness",
   "Sleep",
+  "Eco Mode",  // nouvelle option ajoutée
   "Theme",
   "About",
 };
@@ -1160,6 +1177,33 @@ void showLoadingSSB()
   }
 }
 
+
+
+
+
+void powerOff() {
+  Serial.println("Eco Mode: Powering off...");
+  if (display_on) {
+    spr.setTextDatum(MC_DATUM);
+    spr.fillSmoothRoundRect(80, 40, 160, 40, 4, theme[themeIdx].text);
+    spr.fillSmoothRoundRect(81, 41, 158, 38, 4, theme[themeIdx].menu_bg);
+    spr.drawString("Power Off", 160, 62, 4);
+    spr.pushSprite(0, 0);
+    delay(1000);
+  }
+  // Lance le deep sleep (équivaut à couper l'alimentation)
+  esp_deep_sleep_start();
+}
+
+
+
+
+
+
+
+
+
+
 /**
  *   Sets Band up (1) or down (!1)
  */
@@ -1695,6 +1739,59 @@ void showSettings() {
   drawSprite();
 }
 
+
+
+
+
+// Fonction d'ajustement de l'intervalle Eco mode (similaire à doSleep)
+void doEcoMode(int8_t v) {
+  // Incrémente ou décrémente l’index
+  ecoModeIndex += (v == 1) ? 1 : -1;
+  if (ecoModeIndex > 5)
+    ecoModeIndex = 0;
+  else if (ecoModeIndex < 0)
+    ecoModeIndex = 5;
+  
+  // Met à jour l'intervalle courant en minutes
+  currentEcoInterval = EcoIntervals[ecoModeIndex];
+  showEco();
+}
+
+// Bascule l'activation Eco mode. Quand activé, on enregistre l'heure de départ.
+void toggleEcoMode() {
+  ecoModeEnabled = !ecoModeEnabled;
+  if (ecoModeEnabled) {
+    ecoStartTime = millis();
+  }
+  showEco();
+}
+
+// Affiche la configuration Eco Mode à l'écran
+void showEco() {
+  if (display_on) {
+    spr.setTextDatum(MC_DATUM);
+    // On dessine une zone de message similaire à showLoadingSSB ou showSleep
+    spr.fillSmoothRoundRect(80, 40, 160, 40, 4, theme[themeIdx].text);
+    spr.fillSmoothRoundRect(81, 41, 158, 38, 4, theme[themeIdx].menu_bg);
+    char buf[20];
+    sprintf(buf, "Eco: %d min", currentEcoInterval);
+    if (ecoModeEnabled)
+      strcat(buf, " ON");
+    else
+      strcat(buf, " OFF");
+    spr.drawString(buf, 160, 62, 4);
+    spr.pushSprite(0, 0);
+  }
+}
+
+
+
+
+
+
+
+
+
 /**
  * Starts the MENU action process
  */
@@ -1791,32 +1888,33 @@ void doCurrentMenuCmd() {
 void doCurrentSettingsMenuCmd() {
   disableCommands();
   switch (currentSettingsMenuCmd) {
-  case MENU_BRIGHTNESS:
+    case MENU_BRIGHTNESS:
       cmdBrt = true;
       showBrt();
       break;
-
-  case MENU_SLEEP:
+    case MENU_SLEEP:
       cmdSleep = true;
       showSleep();
       break;
-
-  case MENU_THEME:
+    case MENU_ECO:
+      cmdEco = true;
+      showEco();
+      break;
+    case MENU_THEME:
       cmdTheme = true;
       showTheme();
       break;
-
-  case MENU_ABOUT:
+    case MENU_ABOUT:
       cmdAbout = true;
       showAbout();
       break;
-
-  default:
+    default:
       showStatus();
       break;
   }
   currentSettingsMenuCmd = -1;
 }
+
 
 
 uint8_t getStrength() {
@@ -3083,6 +3181,12 @@ void loop() {
       doSettings(encoderCount);
     else if (cmdBrt)
       doBrt(encoderCount);
+      else if (cmdEco) {
+        doEcoMode(encoderCount);
+        encoderCount = 0;
+        resetEepromDelay();
+        elapsedSleep = elapsedCommand = millis();
+      }
     else if (cmdSleep)
       doSleep(encoderCount);
     else if (cmdTheme)
@@ -3197,7 +3301,24 @@ void loop() {
       showVolume();
       delay(MIN_ELAPSED_TIME); // waits a little more for releasing the button.
       elapsedSleep = elapsedCommand = millis();
-   } else if (pb1_released && !pb1_long_released && !seekModePress) {
+   } 
+    
+    
+    else if (pb1_released && cmdEco) {
+  // En mode Eco, un appui court bascule l'activation/désactivation
+  toggleEcoMode();
+  delay(MIN_ELAPSED_TIME);
+  elapsedSleep = elapsedCommand = millis();
+}
+    
+    
+    
+    
+    
+    
+    
+    
+    else if (pb1_released && !pb1_long_released && !seekModePress) {
       pb1_released = pb1_short_released = pb1_long_released = false;
       if (!display_on) {
         if (currentSleep) {
@@ -3306,6 +3427,20 @@ void loop() {
     seekModePress = false;
     pb1_released = pb1_short_released = pb1_long_released = false;
   }
+
+
+
+// Vérifie si le mode Eco est activé et si le temps écoulé dépasse l'intervalle défini
+if (ecoModeEnabled) {
+  if ((millis() - ecoStartTime) >= (currentEcoInterval * 60UL * 1000UL)) {
+    powerOff();
+  }
+}
+
+
+
+
+  
   
   // Periodically refresh the main screen
   // This covers the case where there is nothing else triggering a refresh
