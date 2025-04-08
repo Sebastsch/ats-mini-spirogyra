@@ -443,8 +443,8 @@ const ColorTheme theme[] = {
     0x8C51, // batt_low
     0x47F1, // batt_charge
     0xFFFF, // batt_icon
-    0xFFFF, // Ster_icon
-    0xFFFF, // Mono_icon
+    0xDEFA, // Ster_icon
+    0xDEFA, // Mono_icon
     0x4D15, // band_text
     0x4D15, // mode_text
     0x4083, // mode_border
@@ -452,7 +452,7 @@ const ColorTheme theme[] = {
     0x2A2C, // box_border
     0xDEFA, // box_text
     0x2A2C, // box_off_bg
-    0xFFFF, // box_off_text
+    0xDEFA, // box_off_text
     0x2A2C, // menu_bg
     0x2A2C, // menu_border
     0xD69A, // menu_hdr
