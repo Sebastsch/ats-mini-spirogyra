@@ -2123,7 +2123,7 @@ void drawSprite()
         spr.drawString(".000", 5+freq_offset_x, 15+freq_offset_y, 4);
       }
       spr.setTextColor(theme[themeIdx].funit_text, theme[themeIdx].bg);
-      spr.drawString("kHz", funit_offset_x, funit_offset_y);
+      spr.drawString("KHz", funit_offset_x, funit_offset_y);
     }
 
     if (isModalMode()) {
@@ -2361,7 +2361,7 @@ void cleanBfoRdsInfo()
 
 void showRDSStation()
 {
-  stationName[50] = bufferStationName[50] = '\0';
+  //stationName[50] = bufferStationName[50] = '\0';
   if (strcmp(bufferStationName, stationName) == 0 ) return;
   cleanBfoRdsInfo();
   strcpy(bufferStationName, stationName);
@@ -2370,7 +2370,7 @@ void showRDSStation()
 
 void showRDSMsg()
 {
-  rdsMsg[100] = bufferRdsMsg[100] = '\0';
+  //rdsMsg[100] = bufferRdsMsg[100] = '\0';
   if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
   cleanBfoRdsInfo();
   strcpy(bufferRdsMsg, rdsMsg);
