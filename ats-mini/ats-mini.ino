@@ -2038,8 +2038,7 @@ void drawMenu() {
     if (cmdEco) {
       spr.setTextColor(theme[themeIdx].menu_param, theme[themeIdx].menu_bg);
       spr.fillRoundRect(6 + menu_offset_x, 24 + menu_offset_y + (2 * 16), 66 + menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
-  // Affiche l'intervalle Eco choisi en minutes (par exemple : 30, 60, etc.)
-      spr.drawNumber(currentEcoInterval, 40 + menu_offset_x + (menu_delta_x / 2), 60 + menu_offset_y, 4);
+      spr.drawNumber(currentEco, 40 + menu_offset_x + (menu_delta_x / 2), 60 + menu_offset_y, 4);
     }
   }
 }
