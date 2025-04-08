@@ -3304,12 +3304,12 @@ void loop() {
    } 
     
     
-    else if (pb1_released && cmdEco) {
+//    else if (pb1_released && cmdEco) {
   // En mode Eco, un appui court bascule l'activation/désactivation
-  toggleEcoMode();
-  delay(MIN_ELAPSED_TIME);
-  elapsedSleep = elapsedCommand = millis();
-}
+ // toggleEcoMode();
+ // delay(MIN_ELAPSED_TIME);
+ // elapsedSleep = elapsedCommand = millis();
+//}
     
     
     
