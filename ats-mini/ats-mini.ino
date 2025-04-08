@@ -585,6 +585,8 @@ bool isCB() {
 
 
 void doEcoMode(uint16_t v);
+void showEco();
+void powerOff();
 
 
 // Generation of step value
@@ -2864,6 +2866,18 @@ void buttonCheck() {
       pb1_last = pb1_current;
     }
 
+
+if (pb1_released && cmdEco) {
+  // Validation de l'option Eco Mode par un appui court sur le bouton
+  ecoModeEnabled = true;      // On active le mode Eco
+  ecoStartTime = millis();      // On démarre la minuterie
+  // Vous pouvez éventuellement afficher un message de confirmation
+  disableCommands();
+  showStatus();
+  delay(MIN_ELAPSED_TIME); // Petit délai pour la gestion de l'appui
+  elapsedSleep = elapsedCommand = millis();
+}
+
     if ((millis() - pb1_edge_time) > CLICK_TIME) {         // Debounced
       if (pb1_stable == HIGH && pb1_last == LOW) {         // button is pressed
         // Debug
@@ -3258,7 +3272,7 @@ void loop() {
     
     else if (cmdEco) {
       doEcoMode(encoderCount);
-      //encoderCount = 0;
+      encoderCount = 0;
       resetEepromDelay();
       elapsedSleep = elapsedCommand = millis();
     }
