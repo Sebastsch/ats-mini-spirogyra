@@ -2960,6 +2960,20 @@ void displayOn() {
   drawSprite();
 }
 
+
+void powerOff() {
+  Serial.println("Eco Mode : Arrêt de l'ESP32...");
+  // Optionnel : afficher un message sur l'écran
+  spr.setTextDatum(MC_DATUM);
+  spr.fillSmoothRoundRect(80, 40, 160, 40, 4, theme[themeIdx].text);
+  spr.fillSmoothRoundRect(81, 41, 158, 38, 4, theme[themeIdx].menu_bg);
+  spr.drawString("Power Off",160, 62, 4);
+  spr.pushSprite(0,0);
+  delay(1000);
+  // Passage en deep sleep (arrêt complet)
+  esp_deep_sleep_start();
+
+
 void captureScreen() {
   uint16_t width = spr.width(), height = spr.height();
   char sb[9];
