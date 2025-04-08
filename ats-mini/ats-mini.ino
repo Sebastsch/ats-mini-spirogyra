@@ -3321,9 +3321,9 @@ void loop() {
 
 // Vérification périodique de l'activation Eco Mode
 if (ecoModeEnabled) {
-  // Si le temps écoulé dépasse l'intervalle (converti en millisecondes)
-  if ((millis() - ecoStartTime) >= (currentEcoInterval * 60UL * 1000UL)) {
-    powerOff();
+  // currentEco contient l'intervalle en minutes. On le convertit en millisecondes.
+  if ((millis() - ecoStartTime) >= (currentEco * 60UL * 1000UL)) {
+    powerOff();  // Pour mettre l'appareil en deep sleep (arrêt complet)
   }
 }
   
