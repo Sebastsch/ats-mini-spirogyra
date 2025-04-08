@@ -8,7 +8,7 @@
 #include <SI4735.h>
 #include "Rotary.h"                // Disabled half-step mode
 #include "patch_init.h"            // SSB patch for whole SSBRX initialization string
-#include "esp_sleep.h"             // Assurez-vous que cette inclusion est présente en début de fichier
+#include "esp_sleep.h"
 #include "poxel_font16pt7b.h"      // Font1 Band display
 #include "Technology10pt7b.h"      // Font2 RDS Station
 #include "PixelOperator8p.h"       // Font3 RDS Message
@@ -282,6 +282,15 @@ int8_t currentAVC = 48;                 // Selected AVC, range = 12 to 90 in ste
 uint16_t currentSleep = 30;             // Display sleep timeout, range = 0 to 255 in steps of 5
 long elapsedSleep = millis();           // Display sleep timer
 
+
+// Ajoutez ces définitions dans la section globale (auparavant d’autres variables similaires)
+const uint16_t EcoIntervals[6] = {30, 60, 90, 120, 150, 180}; // en minutes
+uint8_t ecoModeIndex = 0;
+uint16_t currentEcoInterval = EcoIntervals[0]; // Valeur par défaut : 30 minutes
+bool ecoModeEnabled = false;  // Mode Eco activé ou non
+uint32_t ecoStartTime = 0;    // Horodatage du démarrage de la minuterie Eco Mode
+
+
 // Background screen refresh
 uint32_t background_timer = millis();   // Background screen refresh timer.
 uint32_t tuning_timer = millis();       // Tuning hold off timer.
@@ -292,19 +301,6 @@ uint16_t adc_read_total = 0;            // Total ADC count
 uint16_t adc_read_avr;                  // Average ADC count = adc_read_total / BATT_ADC_READS
 float adc_volt_avr;                     // Average ADC voltage with correction
 uint8_t batt_soc_state = 255;           // State machine used for battery state of charge (SOC) detection with hysteresis (Default = Illegal state)
-
-
-
-// Eco Mode
-const uint16_t EcoIntervals[6] = {30, 60, 90, 120, 150, 180}; // en minutes
-uint8_t ecoModeIndex = 0;
-uint16_t currentEcoInterval = EcoIntervals[0]; // Valeur par défaut : 30 minutes
-bool ecoModeEnabled = false;  // Mode Eco activé ou non
-uint32_t ecoStartTime = 0;    // Horodatage du démarrage de la minuterie Eco Mode
-
-
-
-
 
 // Time
 uint32_t clock_timer = 0;
@@ -1022,6 +1018,7 @@ void disableCommands()
   cmdSettings = false;
   cmdBrt = false;
   cmdSleep = false;
+  cmdEco = false;
   cmdTheme = false;
   cmdAbout = false;
 }
@@ -1055,6 +1052,7 @@ bool isSettingsMode() {
           cmdSettings |
           cmdBrt |
           cmdSleep |
+          cmdEco |
           cmdTheme
           );
 }
@@ -1176,33 +1174,6 @@ void showLoadingSSB()
     spr.pushSprite(0,0);
   }
 }
-
-
-
-
-
-void powerOff() {
-  Serial.println("Eco Mode: Powering off...");
-  if (display_on) {
-    spr.setTextDatum(MC_DATUM);
-    spr.fillSmoothRoundRect(80, 40, 160, 40, 4, theme[themeIdx].text);
-    spr.fillSmoothRoundRect(81, 41, 158, 38, 4, theme[themeIdx].menu_bg);
-    spr.drawString("Power Off", 160, 62, 4);
-    spr.pushSprite(0, 0);
-    delay(1000);
-  }
-  // Lance le deep sleep (équivaut à couper l'alimentation)
-  esp_deep_sleep_start();
-}
-
-
-
-
-
-
-
-
-
 
 /**
  *   Sets Band up (1) or down (!1)
@@ -1739,59 +1710,6 @@ void showSettings() {
   drawSprite();
 }
 
-
-
-
-
-// Fonction d'ajustement de l'intervalle Eco mode (similaire à doSleep)
-void doEcoMode(int8_t v) {
-  // Incrémente ou décrémente l’index
-  ecoModeIndex += (v == 1) ? 1 : -1;
-  if (ecoModeIndex > 5)
-    ecoModeIndex = 0;
-  else if (ecoModeIndex < 0)
-    ecoModeIndex = 5;
-  
-  // Met à jour l'intervalle courant en minutes
-  currentEcoInterval = EcoIntervals[ecoModeIndex];
-  showEco();
-}
-
-// Bascule l'activation Eco mode. Quand activé, on enregistre l'heure de départ.
-void toggleEcoMode() {
-  ecoModeEnabled = !ecoModeEnabled;
-  if (ecoModeEnabled) {
-    ecoStartTime = millis();
-  }
-  showEco();
-}
-
-// Affiche la configuration Eco Mode à l'écran
-void showEco() {
-  if (display_on) {
-    spr.setTextDatum(MC_DATUM);
-    // On dessine une zone de message similaire à showLoadingSSB ou showSleep
-    spr.fillSmoothRoundRect(80, 40, 160, 40, 4, theme[themeIdx].text);
-    spr.fillSmoothRoundRect(81, 41, 158, 38, 4, theme[themeIdx].menu_bg);
-    char buf[20];
-    sprintf(buf, "Eco: %d min", currentEcoInterval);
-    if (ecoModeEnabled)
-      strcat(buf, " ON");
-    else
-      strcat(buf, " OFF");
-    spr.drawString(buf, 160, 62, 4);
-    spr.pushSprite(0, 0);
-  }
-}
-
-
-
-
-
-
-
-
-
 /**
  * Starts the MENU action process
  */
@@ -1882,9 +1800,7 @@ void doCurrentMenuCmd() {
 }
 
 
-/**
- * Starts the SETTINGS action process
- */
+// Exemple dans doCurrentSettingsMenuCmd()
 void doCurrentSettingsMenuCmd() {
   disableCommands();
   switch (currentSettingsMenuCmd) {
@@ -1914,7 +1830,6 @@ void doCurrentSettingsMenuCmd() {
   }
   currentSettingsMenuCmd = -1;
 }
-
 
 
 uint8_t getStrength() {
@@ -2116,6 +2031,12 @@ void drawMenu() {
       spr.setTextColor(theme[themeIdx].menu_param,theme[themeIdx].menu_bg);
       spr.fillRoundRect(6+menu_offset_x,24+menu_offset_y+(2*16),66+menu_delta_x,16,2,theme[themeIdx].menu_bg);
       spr.drawNumber(currentSleep,40+menu_offset_x+(menu_delta_x/2),60+menu_offset_y,4);
+    }
+    if (cmdEco) {
+      spr.setTextColor(theme[themeIdx].menu_param, theme[themeIdx].menu_bg);
+      spr.fillRoundRect(6 + menu_offset_x, 24 + menu_offset_y + (2 * 16), 66 + menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
+  // Affiche l'intervalle Eco choisi en minutes (par exemple : 30, 60, etc.)
+      spr.drawNumber(currentEcoInterval, 40 + menu_offset_x + (menu_delta_x / 2), 60 + menu_offset_y, 4);
     }
   }
 }
@@ -2837,6 +2758,32 @@ void showSleep() {
   drawSprite();
 }
 
+
+
+// Fonction d'ajustement Eco Mode, similaire à doSleep()
+void doEcoMode( uint16_t v ) {
+  if ( v == 1 ) {
+    ecoModeIndex++;                   // Passage à l'option supérieure
+    if ( ecoModeIndex > 5 ) ecoModeIndex = 0; // Bouclage en fin de tableau
+  } else {
+    if ( ecoModeIndex == 0 ) ecoModeIndex = 5;  // Bouclage vers la dernière valeur
+    else ecoModeIndex--;              // Passage à l'option inférieure
+  }
+  currentEcoInterval = EcoIntervals[ecoModeIndex]; // Mise à jour de l'intervalle courant
+  showEco();
+}
+
+// Fonction d'affichage Eco Mode (similaire à showSleep)
+void showEco() {
+  // Ici, le simple rafraîchissement avec drawSprite()
+  // Vous pouvez, par exemple, ajouter du texte pour indiquer "Eco: XX min"
+  drawSprite();
+}
+
+
+
+
+
 void doTheme( uint16_t v ) {
   if (v == 1)
     themeIdx = (themeIdx < lastTheme) ? (themeIdx + 1) : 0;
@@ -3181,12 +3128,6 @@ void loop() {
       doSettings(encoderCount);
     else if (cmdBrt)
       doBrt(encoderCount);
-      else if (cmdEco) {
-        doEcoMode(encoderCount);
-        encoderCount = 0;
-        resetEepromDelay();
-        elapsedSleep = elapsedCommand = millis();
-      }
     else if (cmdSleep)
       doSleep(encoderCount);
     else if (cmdTheme)
@@ -3289,7 +3230,20 @@ void loop() {
         displayOn();
       }
       elapsedSleep = millis();
-    } else if (pb1_short_released && display_on && !seekModePress) {
+    } 
+    
+    
+    else if (cmdEco) {
+      doEcoMode(encoderCount);
+      //encoderCount = 0;
+      resetEepromDelay();
+      elapsedSleep = elapsedCommand = millis();
+    }
+    
+    
+    
+    
+    else if (pb1_short_released && display_on && !seekModePress) {
       pb1_released = pb1_short_released = pb1_long_released = false;
       if (muted) {
         rx.setVolume(mute_vol_val);
@@ -3301,24 +3255,7 @@ void loop() {
       showVolume();
       delay(MIN_ELAPSED_TIME); // waits a little more for releasing the button.
       elapsedSleep = elapsedCommand = millis();
-   } 
-    
-    
-//    else if (pb1_released && cmdEco) {
-  // En mode Eco, un appui court bascule l'activation/désactivation
- // toggleEcoMode();
- // delay(MIN_ELAPSED_TIME);
- // elapsedSleep = elapsedCommand = millis();
-//}
-    
-    
-    
-    
-    
-    
-    
-    
-    else if (pb1_released && !pb1_long_released && !seekModePress) {
+   } else if (pb1_released && !pb1_long_released && !seekModePress) {
       pb1_released = pb1_short_released = pb1_long_released = false;
       if (!display_on) {
         if (currentSleep) {
@@ -3358,6 +3295,17 @@ void loop() {
       displayOff();
     }
   }
+
+
+// Vérification périodique de l'activation Eco Mode
+if (ecoModeEnabled) {
+  // Si le temps écoulé dépasse l'intervalle (converti en millisecondes)
+  if ((millis() - ecoStartTime) >= (currentEcoInterval * 60UL * 1000UL)) {
+    powerOff();
+  }
+}
+  
+  
 
   // Show RSSI status only if this condition has changed
   if ((millis() - elapsedRSSI) > MIN_ELAPSED_RSSI_TIME * 6)
@@ -3427,20 +3375,6 @@ void loop() {
     seekModePress = false;
     pb1_released = pb1_short_released = pb1_long_released = false;
   }
-
-
-
-// Vérifie si le mode Eco est activé et si le temps écoulé dépasse l'intervalle défini
-if (ecoModeEnabled) {
-  if ((millis() - ecoStartTime) >= (currentEcoInterval * 60UL * 1000UL)) {
-    powerOff();
-  }
-}
-
-
-
-
-  
   
   // Periodically refresh the main screen
   // This covers the case where there is nothing else triggering a refresh
