@@ -2812,25 +2812,7 @@ void showSleep() {
 
 
 
-// Permet de faire défiler les différentes durées Eco mode avec l'encodeur
-void doEco(int16_t v) {
-  if (v == 1) {
-    ecoModeIdx++;
-    if (ecoModeIdx >= ecoModeCount)
-      ecoModeIdx = 0;
-  }
-  else if (v == -1) {
-    if (ecoModeIdx == 0)
-      ecoModeIdx = ecoModeCount - 1;
-    else
-      ecoModeIdx--;
-  }
-  ecomode_duration = ecoModes[ecoModeIdx];
-  showEco();
-}
-
-// Affiche l'option Eco mode dans le menu, par exemple "Eco: 90min"
-// Permet de faire défiler les différentes durées Eco mode via l'encodeur
+// Permet de faire défiler les différentes durées Eco mode
 void doEco(int16_t v) {
   if (v == 1) {
     ecoModeIdx++;
@@ -2849,32 +2831,35 @@ void doEco(int16_t v) {
 
 // Affiche l'option Eco mode dans le menu (par exemple "Eco: 90min")
 void showEco() {
-  // On met à jour l'affichage général
+  // On redessine l'écran pour mettre à jour l'affichage de la commande
   drawSprite();
-  // On crée un encart pour afficher la durée sélectionnée dans le menu Settings
   spr.setTextColor(theme[themeIdx].menu_param, theme[themeIdx].menu_bg);
-  spr.fillRoundRect(6 + menu_offset_x, 24 + menu_offset_y + (2 * 16), 66 + menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
+  spr.fillRoundRect(6 + menu_offset_x, 24 + menu_offset_y + (2 * 16),
+                    66 + menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
   char ecoStr[10];
   sprintf(ecoStr, "%dmin", ecomode_duration);
-  spr.drawString(ecoStr, 40 + menu_offset_x + (menu_delta_x / 2), 60 + menu_offset_y, 4);
+  spr.drawString(ecoStr, 40 + menu_offset_x + (menu_delta_x / 2),
+                 60 + menu_offset_y, 4);
   spr.pushSprite(0, 0);
 }
 
-// Activation de l'Eco mode (similaire à la fonction Sleep)
-// Ici, on configure un réveil programmée identique à la fonction Sleep de votre firmware.
+
+// Active l'Eco mode : l'ESP32 est mis en deep sleep avec réveil automatique après ecomode_duration minutes.
+// Cette fonction est analogue à celle de Sleep.
 void activateEcoMode() {
-  // On désactive l'affichage (similaire à displayOff())
+  // Désactive l'affichage (fonction existante)
   displayOff();
 
   Serial.printf("Eco mode activé : Deep Sleep pour %d minutes...\n", ecomode_duration);
   delay(100);  // Laisser le temps d'envoyer le message sur Serial
 
-  // Active le réveil timer en deep sleep : la durée est convertie en microsecondes.
+  // Configure le timer de réveil pour ecomode_duration minutes (conversion en µs)
   esp_sleep_enable_timer_wakeup((uint64_t)ecomode_duration * 60ULL * 1000000ULL);
 
-  // Mise en deep sleep ; après cette fonction, l'appareil redémarrera automatiquement
+  // Entre en deep sleep et redémarre dès le réveil
   esp_deep_sleep_start();
 }
+
 
 
 
@@ -3320,8 +3305,8 @@ void loop() {
     encoderCount = 0;
     resetEepromDelay();
     elapsedSleep = elapsedCommand = millis();
-  } else 
-    if (pb1_released && !pb1_long_released && !seekModePress) {
+  } 
+  else if (pb1_released && !pb1_long_released && !seekModePress) {
       pb1_released = pb1_short_released = pb1_long_released = false;
       if (cmdEco) {
         activateEcoMode();
@@ -3355,10 +3340,9 @@ void loop() {
           drawSprite();
         }
       }
-      delay(MIN_ELAPSED_TIME);
-      elapsedSleep = elapsedCommand = millis();
-    }
-}
+    delay(MIN_ELAPSED_TIME);
+    elapsedSleep = elapsedCommand = millis();
+  }
     
 
   // Display sleep timeout
