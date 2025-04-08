@@ -373,9 +373,9 @@ const char *settingsMenu[] = {
   "About",
 };
 
-const int lastSettingsMenu = (sizeof settingsMenu / sizeof(char *)) - 1;
 
 int8_t settingsMenuIdx = MENU_BRIGHTNESS;
+
 const int lastSettingsMenu = (sizeof settingsMenu / sizeof(char *)) - 1;
 int8_t currentSettingsMenuCmd = -1;
 
