@@ -1881,6 +1881,7 @@ void doCurrentSettingsMenuCmd() {
 
 
 
+
 uint8_t getStrength() {
 #if THEME_EDITOR
   return 17;
@@ -2829,10 +2830,28 @@ void doEco(int16_t v) {
 }
 
 // Affiche l'option Eco mode dans le menu, par exemple "Eco: 90min"
+// Permet de faire défiler les différentes durées Eco mode via l'encodeur
+void doEco(int16_t v) {
+  if (v == 1) {
+    ecoModeIdx++;
+    if (ecoModeIdx >= ecoModeCount)
+      ecoModeIdx = 0;
+  } 
+  else if (v == -1) {
+    if (ecoModeIdx == 0)
+      ecoModeIdx = ecoModeCount - 1;
+    else
+      ecoModeIdx--;
+  }
+  ecomode_duration = ecoModes[ecoModeIdx];
+  showEco();
+}
+
+// Affiche l'option Eco mode dans le menu (par exemple "Eco: 90min")
 void showEco() {
-  // Mise à jour de l'affichage général
+  // On met à jour l'affichage général
   drawSprite();
-  // Pour l'affichage spécifique Eco mode dans le menu, on peut ajouter un encart :
+  // On crée un encart pour afficher la durée sélectionnée dans le menu Settings
   spr.setTextColor(theme[themeIdx].menu_param, theme[themeIdx].menu_bg);
   spr.fillRoundRect(6 + menu_offset_x, 24 + menu_offset_y + (2 * 16), 66 + menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
   char ecoStr[10];
@@ -2841,14 +2860,19 @@ void showEco() {
   spr.pushSprite(0, 0);
 }
 
-// Fonction qui désactive l’affichage et invoque le power off
+// Activation de l'Eco mode (similaire à la fonction Sleep)
+// Ici, on configure un réveil programmée identique à la fonction Sleep de votre firmware.
 void activateEcoMode() {
-  // Désactive l’affichage et autres fonctions
+  // On désactive l'affichage (similaire à displayOff())
   displayOff();
-  Serial.printf("Activation du Power Off Eco mode. L'appareil va s'éteindre complètement.\n");
-  delay(100);  // Permet d’envoyer le message sur Serial
-  
-  // Ici, nous n'activons PAS de source de réveil : l'ESP32-S3 reste coupé jusqu'à réinitialisation manuelle.
+
+  Serial.printf("Eco mode activé : Deep Sleep pour %d minutes...\n", ecomode_duration);
+  delay(100);  // Laisser le temps d'envoyer le message sur Serial
+
+  // Active le réveil timer en deep sleep : la durée est convertie en microsecondes.
+  esp_sleep_enable_timer_wakeup((uint64_t)ecomode_duration * 60ULL * 1000000ULL);
+
+  // Mise en deep sleep ; après cette fonction, l'appareil redémarrera automatiquement
   esp_deep_sleep_start();
 }
 
@@ -3296,68 +3320,45 @@ void loop() {
     encoderCount = 0;
     resetEepromDelay();
     elapsedSleep = elapsedCommand = millis();
-  } else {
-    if (pb1_long_pressed && !seekModePress) {
-      pb1_long_pressed = pb1_short_pressed = pb1_pressed = false;
-      if (display_on) {
-        displayOff();
-      } else {
-        displayOn();
-      }
-      elapsedSleep = millis();
-    } else if (pb1_short_released && display_on && !seekModePress) {
+  } else 
+    if (pb1_released && !pb1_long_released && !seekModePress) {
       pb1_released = pb1_short_released = pb1_long_released = false;
-      if (muted) {
-        rx.setVolume(mute_vol_val);
-        muted = false;
+      if (cmdEco) {
+        activateEcoMode();
       }
-      disableCommands();
-      cmdVolume = true;
-      menuIdx = MENU_VOLUME;
-      showVolume();
-      delay(MIN_ELAPSED_TIME); // waits a little more for releasing the button.
+      else if (!display_on) {
+        if (currentSleep) {
+          displayOn();
+        }
+      }
+      else if (cmdMenu) {
+        currentMenuCmd = menuIdx;
+        doCurrentMenuCmd();
+      }
+      else if (cmdSettings) {
+        currentSettingsMenuCmd = settingsMenuIdx;
+        doCurrentSettingsMenuCmd();
+      }
+      else {
+        if (isModalMode()) {
+          disableCommands();
+          showStatus();
+          showCommandStatus((char *)"VFO ");
+        }
+        else if (bfoOn) {
+          bfoOn = false;
+          showStatus();
+        }
+        else {
+          cmdMenu = !cmdMenu;
+          currentMenuCmd = menuIdx;
+          drawSprite();
+        }
+      }
+      delay(MIN_ELAPSED_TIME);
       elapsedSleep = elapsedCommand = millis();
-   } 
-    else if (pb1_released && !pb1_long_released && !seekModePress) {
-  pb1_released = pb1_short_released = pb1_long_released = false;
-  if (cmdEco) {
-    // Si Eco mode est actif, lance la procédure de power off.
-    activateEcoMode();
-    // Le système s'éteint complètement ; aucun code ne sera exécuté après.
-  }
-  else if (!display_on) {
-    if (currentSleep) {
-      displayOn();
     }
-  }
-  else if (cmdMenu) {
-    currentMenuCmd = menuIdx;
-    doCurrentMenuCmd();
-  }
-  else if (cmdSettings) {
-    currentSettingsMenuCmd = settingsMenuIdx;
-    doCurrentSettingsMenuCmd();
-  }
-  else {
-    if (isModalMode()) {
-      disableCommands();
-      showStatus();
-      showCommandStatus((char *)"VFO ");
-    }
-    else if (bfoOn) {
-      bfoOn = false;
-      showStatus();
-    }
-    else {
-      cmdMenu = !cmdMenu;
-      currentMenuCmd = menuIdx;
-      drawSprite();
-    }
-  }
-  delay(MIN_ELAPSED_TIME); // Pour le debounce
-  elapsedSleep = elapsedCommand = millis();
-    }
-  }
+}
     
 
   // Display sleep timeout
