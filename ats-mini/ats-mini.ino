@@ -116,6 +116,16 @@
 #define BACKGROUND_REFRESH_TIME 5000    // Background screen refresh time. Covers the situation where there are no other events causing a refresh
 #define TUNE_HOLDOFF_TIME         90    // Timer to hold off display whilst tuning
 
+
+// Ecomode
+#define MIN_ECOMODE_TIMEOUT 0    // 0 minute (désactivé)
+#define MAX_ECOMODE_TIMEOUT 180  // 180 minutes maximum
+#define ECOMODE_STEP 30          // Incrément par 30 minutes
+
+// La durée de l'ecomode en minutes, initialisée à 0 à chaque démarrage.
+uint16_t ecomodeTimeout = 0;
+
+
 // Band Types
 #define FM_BAND_TYPE 0
 #define MW_BAND_TYPE 1
@@ -151,8 +161,8 @@
 // Settings Options
 #define MENU_BRIGHTNESS   0
 #define MENU_SLEEP        1
-#define MENU_ECO          2
-#define MENU_THEME        3
+#define MENU_THEME        2
+#define MENU_ECOMODE      3
 #define MENU_ABOUT        4
 
 #define EEPROM_SIZE     512
@@ -207,7 +217,7 @@ bool cmdAvc = false;
 bool cmdSettings = false;
 bool cmdBrt = false;
 bool cmdSleep = false;
-bool cmdEco = false;
+bool cmdEcomode = false;
 bool cmdTheme = false;
 bool cmdAbout = false;
 
@@ -283,12 +293,8 @@ uint16_t currentSleep = 30;             // Display sleep timeout, range = 0 to 2
 long elapsedSleep = millis();           // Display sleep timer
 
 
+unsigned long elapsedEcomode = millis();  // Minuteur pour l'ecomode
 
-// Option Eco Mode : à partir de 30, incrémenté par 30 minutes, avec une limite maximum (ici, 280 minutes)
-uint16_t currentEco = 30;   // Valeur initiale en minutes pour le mode Eco
-// Variables globales pour Eco Mode
-bool ecoModeEnabled = false;       // Etat du mode Eco (désactivé par défaut)
-unsigned long ecoStartTime = 0;    // Pour stocker le timestamp du démarrage du mode Eco
 
 
 // Background screen refresh
@@ -362,10 +368,12 @@ int8_t currentMenuCmd = -1;
 const char *settingsMenu[] = {
   "Brightness",
   "Sleep",
-  "Eco Mode",  // nouvelle option ajoutée
   "Theme",
+  "Ecomode",
   "About",
 };
+
+const int lastSettingsMenu = (sizeof settingsMenu / sizeof(char *)) - 1;
 
 int8_t settingsMenuIdx = MENU_BRIGHTNESS;
 const int lastSettingsMenu = (sizeof settingsMenu / sizeof(char *)) - 1;
@@ -583,10 +591,6 @@ bool isCB() {
 }
 
 
-
-void doEcoMode(uint16_t v);
-void showEco();
-void powerOff();
 
 
 // Generation of step value
@@ -1024,7 +1028,7 @@ void disableCommands()
   cmdSettings = false;
   cmdBrt = false;
   cmdSleep = false;
-  cmdEco = false;
+  cmdEcomode = false;
   cmdTheme = false;
   cmdAbout = false;
 }
@@ -1058,7 +1062,7 @@ bool isSettingsMode() {
           cmdSettings |
           cmdBrt |
           cmdSleep |
-          cmdEco |
+          cmdEcomode |
           cmdTheme
           );
 }
@@ -1818,13 +1822,13 @@ void doCurrentSettingsMenuCmd() {
       cmdSleep = true;
       showSleep();
       break;
-    case MENU_ECO:
-      cmdEco = true;
-      showEco();
-      break;
     case MENU_THEME:
       cmdTheme = true;
       showTheme();
+      break;
+    case MENU_ECOMODE:  // Assurez-vous d'avoir défini MENU_ECOMODE correctement selon votre index
+      cmdEcomode = true;
+      showEcomode();
       break;
     case MENU_ABOUT:
       cmdAbout = true;
@@ -2038,7 +2042,7 @@ void drawMenu() {
       spr.fillRoundRect(6+menu_offset_x,24+menu_offset_y+(2*16),66+menu_delta_x,16,2,theme[themeIdx].menu_bg);
       spr.drawNumber(currentSleep,40+menu_offset_x+(menu_delta_x/2),60+menu_offset_y,4);
     }
-    if (cmdEco) {
+    if (cmdEcomode) {
       spr.setTextColor(theme[themeIdx].menu_param, theme[themeIdx].menu_bg);
       spr.fillRoundRect(6 + menu_offset_x, 24 + menu_offset_y + (2 * 16), 66 + menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
       spr.drawNumber(currentEco, 40 + menu_offset_x + (menu_delta_x / 2), 60 + menu_offset_y, 4);
@@ -2765,33 +2769,37 @@ void showSleep() {
 
 
 
-void doEcoMode(uint16_t v) {
-  if (v == 1) {                   // Incrémentation : encoder vers le haut
-    currentEco += 30;
-    if (currentEco > 280)
-      currentEco = 280;
-  } else {                        // Décrémentation : encoder vers le bas
-    if (currentEco > 30)
-      currentEco -= 30;
+void doEcomode(int8_t v) {
+  // v == 1 pour incrémenter, v == -1 pour décrémenter.
+  if (v == 1) {
+    ecomodeTimeout += ECOMODE_STEP;
+    if (ecomodeTimeout > MAX_ECOMODE_TIMEOUT)
+      ecomodeTimeout = MAX_ECOMODE_TIMEOUT;
+  } else { // v == -1
+    if (ecomodeTimeout < ECOMODE_STEP)
+      ecomodeTimeout = MIN_ECOMODE_TIMEOUT;
     else
-      currentEco = 30;
+      ecomodeTimeout -= ECOMODE_STEP;
   }
-  showEco();  // Met à jour l'affichage Eco Mode
+  showEcomode();  // Met à jour l'affichage de la valeur
 }
 
-void showEco() {
-  // Vous pouvez ajouter un affichage personnalisé, par exemple :
-  if (display_on) {
-    spr.setTextDatum(MC_DATUM);
-    // Exemple d’affichage similaire à showSleep():
-    spr.fillSmoothRoundRect(6 + menu_offset_x, 24 + menu_offset_y + (2 * 16),
-                            66 + menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
-    // Affiche la valeur Eco (en minutes) au centre
-    spr.drawNumber(currentEco, 40 + menu_offset_x + (menu_delta_x / 2),
-                   60 + menu_offset_y, 4);
-    // Rafraîchit l’affichage
-    drawSprite();
-  }
+
+
+
+void showEcomode() {
+  // Ici on rafraîchit l'écran en dessinant toute l'interface ou en le recadrant
+  drawSprite();
+
+  // On affiche l'option ECO Mode en indiquant la durée sélectionnée
+  spr.setTextDatum(MC_DATUM); // Centre le texte
+  spr.setTextColor(theme[themeIdx].menu_item, theme[themeIdx].menu_bg);
+
+  char buf[20];
+  sprintf(buf, "Ecomode: %d min", ecomodeTimeout);
+  spr.drawString(buf, 160, 80, 2);  // La position et la taille (2) sont adaptables
+
+  spr.pushSprite(0, 0);
 }
 
 
@@ -2866,18 +2874,6 @@ void buttonCheck() {
       pb1_edge_time = millis();
       pb1_last = pb1_current;
     }
-
-
-if (pb1_released && cmdEco) {
-  // Validation de l'option Eco Mode par un appui court sur le bouton
-  ecoModeEnabled = true;      // On active le mode Eco
-  ecoStartTime = millis();      // On démarre la minuterie
-  // Vous pouvez éventuellement afficher un message de confirmation
-  disableCommands();
-  showStatus();
-  delay(MIN_ELAPSED_TIME); // Petit délai pour la gestion de l'appui
-  elapsedSleep = elapsedCommand = millis();
-}
 
     if ((millis() - pb1_edge_time) > CLICK_TIME) {         // Debounced
       if (pb1_stable == HIGH && pb1_last == LOW) {         // button is pressed
@@ -2985,18 +2981,20 @@ void displayOn() {
 }
 
 
-void powerOff() {
-  Serial.println("Eco Mode : Arrêt de l'ESP32...");
-  // Optionnel : afficher un message sur l'écran
-  spr.setTextDatum(MC_DATUM);
-  spr.fillSmoothRoundRect(80, 40, 160, 40, 4, theme[themeIdx].text);
-  spr.fillSmoothRoundRect(81, 41, 158, 38, 4, theme[themeIdx].menu_bg);
-  spr.drawString("Power Off",160, 62, 4);
-  spr.pushSprite(0,0);
-  delay(1000);
-  // Passage en deep sleep (arrêt complet)
+
+void espDeepSleep() {
+  displayOff();  // Éteindre l'affichage avant de passer en mode deep sleep
+  Serial.println("Entrée du mode deep sleep (power off)...");
+  
+  // Configurer le réveil (si souhaité) selon ecomodeTimeout, ici on utilise le temps sélectionné
+  esp_sleep_enable_timer_wakeup(ecomodeTimeout * 60000UL);
+  
   esp_deep_sleep_start();
 }
+
+
+
+
 
 void captureScreen() {
   uint16_t width = spr.width(), height = spr.height();
@@ -3324,6 +3322,8 @@ void loop() {
       }
       delay(MIN_ELAPSED_TIME); // waits a little more for releasing the button.
       elapsedSleep = elapsedCommand = millis();
+      // Réinitialisation des minuteries d'activité
+      elapsedEcomode = millis();
     }
   }
 
@@ -3335,14 +3335,16 @@ void loop() {
   }
 
 
-// Vérification périodique de l'activation Eco Mode
-if (ecoModeEnabled) {
-  // currentEco contient l'intervalle en minutes. On le convertit en millisecondes.
-  if ((millis() - ecoStartTime) >= (currentEco * 60UL * 1000UL)) {
-    powerOff();  // Pour mettre l'appareil en deep sleep (arrêt complet)
+
+
+  // Vérification dans loop() pour le mode ECO (deep sleep)
+if (ecomodeTimeout > 0 && display_on) {
+  if ((millis() - elapsedEcomode) > ecomodeTimeout * 60000UL) {
+    espDeepSleep();  // On passe en deep sleep
   }
 }
   
+
   
 
   // Show RSSI status only if this condition has changed
