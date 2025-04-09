@@ -2281,6 +2281,9 @@ void drawSprite()
       const int max_line_len = 30;
       char line1[max_line_len + 1];
       char line2[max_line_len + 1];
+
+      int len = strlen(bufferRdsMsg);
+      
       if (len <= max_line_len) {
         strncpy(line1, bufferRdsMsg, max_line_len);
         line1[len] = '\0';
