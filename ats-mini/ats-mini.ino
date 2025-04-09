@@ -68,7 +68,7 @@
 #define meter_offset_x   2    // Meter horizontal offset
 #define meter_offset_y   2    // Meter vertical offset
 #define save_offset_x  300    // EEPROM save icon horizontal offset
-#define save_offset_y  118    // EEPROM save icon vertical offset
+#define save_offset_y  116    // EEPROM save icon vertical offset
 #define freq_offset_x  250    // Frequency horizontal offset
 #define freq_offset_y   65    // Frequency vertical offset
 #define funit_offset_x 255    // Frequency Unit horizontal offset
@@ -2793,11 +2793,12 @@ void showEcomode() {
 
   // On affiche l'option ECO Mode en indiquant la durée sélectionnée
   spr.setTextDatum(MC_DATUM); // Centre le texte
-  spr.setTextColor(theme[themeIdx].menu_item, theme[themeIdx].menu_bg);
+  spr.fillSmoothRoundRect(80,40,160,40,4,theme[themeIdx].text);
+  spr.fillSmoothRoundRect(81,41,158,38,4,theme[themeIdx].menu_bg);
 
   char buf[20];
   sprintf(buf, "Ecomode: %d min", ecomodeTimeout);
-  spr.drawString(buf, 160, 80, 2);  // La position et la taille (2) sont adaptables
+  spr.drawString(buf, 160, 62, 4);  // La position et la taille (2) sont adaptables
 
   spr.pushSprite(0, 0);
 }
