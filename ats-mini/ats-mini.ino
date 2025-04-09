@@ -2270,7 +2270,7 @@ void drawSprite()
         //spr.fillRect(rds_offset_x, rds_offset_y - 2, 150, 20, theme[themeIdx].bg);
         spr.setFreeFont(&Technology10pt7b);
         spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
-        spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
+        //spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
         spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
       }
 
@@ -2281,6 +2281,7 @@ void drawSprite()
       const int max_line_len = 30;
       char line1[max_line_len + 1];
       char line2[max_line_len + 1];
+      int len = strlen(bufferRdsMsg);
       if (len <= max_line_len) {
         strncpy(line1, bufferRdsMsg, max_line_len);
         line1[len] = '\0';
