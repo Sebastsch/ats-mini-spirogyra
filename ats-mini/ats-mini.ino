@@ -3554,7 +3554,7 @@ void loop() {
 
   // Add a small default delay in the main loop
   delay(5);
-}reak;
+}break;
     }
   }
 #endif
