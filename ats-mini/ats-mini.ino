@@ -2986,11 +2986,7 @@ void displayOn() {
 
 void espDeepSleep() {
   displayOff();  // Éteindre l'affichage avant de passer en mode deep sleep
-  Serial.println("Entrée du mode deep sleep (power off)...");
-  
-  // Configurer le réveil (si souhaité) selon ecomodeTimeout, ici on utilise le temps sélectionné
-  esp_sleep_enable_timer_wakeup(ecomodeTimeout * 60000UL);
-  
+  Serial.println("Entering deep sleep mode");  
   esp_deep_sleep_start();
 }
 
