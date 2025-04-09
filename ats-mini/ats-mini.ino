@@ -3166,6 +3166,8 @@ void loop() {
       doBrt(encoderCount);
     else if (cmdSleep)
       doSleep(encoderCount);
+    else if (cmdEcomode)       // Ajout de cette branche pour Eco Mode
+      doEcomode(encoderCount);
     else if (cmdTheme)
       doTheme(encoderCount);
     else if (cmdAbout) {}
