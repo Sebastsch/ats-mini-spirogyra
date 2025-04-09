@@ -2790,18 +2790,19 @@ void doEcomode(int8_t v) {
 void showEcomode() {
   // Ici on rafraîchit l'écran en dessinant toute l'interface ou en le recadrant
   drawSprite();
+}
 
   // On affiche l'option ECO Mode en indiquant la durée sélectionnée
-  spr.setTextDatum(MC_DATUM); // Centre le texte
-  spr.fillSmoothRoundRect(80,40,160,40,4,theme[themeIdx].text);
-  spr.fillSmoothRoundRect(81,41,158,38,4,theme[themeIdx].menu_bg);
+//  spr.setTextDatum(MC_DATUM); // Centre le texte
+//  spr.fillSmoothRoundRect(80,40,160,40,4,theme[themeIdx].text);
+//  spr.fillSmoothRoundRect(81,41,158,38,4,theme[themeIdx].menu_bg);
 
-  char buf[20];
-  sprintf(buf, "Ecomode: %d min", ecomodeTimeout);
-  spr.drawString(buf, 160, 62, 4);  // La position et la taille (2) sont adaptables
+//  char buf[20];
+//  sprintf(buf, "Ecomode: %d min", ecomodeTimeout);
+//  spr.drawString(buf, 160, 62, 4);  // La position et la taille (2) sont adaptables
 
-  spr.pushSprite(0, 0);
-}
+//  spr.pushSprite(0, 0);
+//}
 
 
 
