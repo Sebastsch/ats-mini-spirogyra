@@ -441,12 +441,12 @@ const ColorTheme theme[] = {
     0x0000, // batt_border
     0xFBC8, // batt_full
     0x8C51, // batt_low
-    0x47F1, // batt_charge
+    0x758F, // batt_charge
     0xFFFF, // batt_icon
     0x4D15, // Ster_icon
     0x4D15, // Mono_icon
     0xDEFA, // band_text
-    0xDEFA, // mode_text
+    0x4D15, // mode_text
     0x4083, // mode_border
     0x2A2C, // box_bg
     0x2A2C, // box_border
