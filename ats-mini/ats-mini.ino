@@ -1836,50 +1836,49 @@ void doCurrentSettingsMenuCmd() {
   currentSettingsMenuCmd = -1;
 }
 
-
 uint8_t getStrength() {
 #if THEME_EDITOR
-  return 17;
+    return 17;
 #endif
-  if (currentMode != FM) {
-    //dBuV to S point conversion HF
-    if ((rssi <=  1)) return  1;                  // S0
-    if ((rssi >  1) and (rssi <=  2)) return  2;  // S1         // G8PTN: Corrected table
-    if ((rssi >  2) and (rssi <=  3)) return  3;  // S2
-    if ((rssi >  3) and (rssi <=  4)) return  4;  // S3
-    if ((rssi >  4) and (rssi <= 10)) return  5;  // S4
-    if ((rssi > 10) and (rssi <= 16)) return  6;  // S5
-    if ((rssi > 16) and (rssi <= 22)) return  7;  // S6
-    if ((rssi > 22) and (rssi <= 28)) return  8;  // S7
-    if ((rssi > 28) and (rssi <= 34)) return  9;  // S8
-    if ((rssi > 34) and (rssi <= 44)) return 10;  // S9
-    if ((rssi > 44) and (rssi <= 54)) return 11;  // S9 +10
-    if ((rssi > 54) and (rssi <= 64)) return 12;  // S9 +20
-    if ((rssi > 64) and (rssi <= 74)) return 13;  // S9 +30
-    if ((rssi > 74) and (rssi <= 84)) return 14;  // S9 +40
-    if ((rssi > 84) and (rssi <= 94)) return 15;  // S9 +50
-    if  (rssi > 94)                   return 16;  // S9 +60
-    if  (rssi > 95)                   return 17;  //>S9 +60
-  }
-  else
-  {
-    //dBuV to S point conversion FM
-    if  ((rssi <=  1)) return  1;                 // G8PTN: Corrected table
-    if ((rssi >  1) and (rssi <=  2)) return  7;  // S6
-    if ((rssi >  2) and (rssi <=  8)) return  8;  // S7
-    if ((rssi >  8) and (rssi <= 14)) return  9;  // S8
-    if ((rssi > 14) and (rssi <= 24)) return 10;  // S9
-    if ((rssi > 24) and (rssi <= 34)) return 11;  // S9 +10
-    if ((rssi > 34) and (rssi <= 44)) return 12;  // S9 +20
-    if ((rssi > 44) and (rssi <= 54)) return 13;  // S9 +30
-    if ((rssi > 54) and (rssi <= 64)) return 14;  // S9 +40
-    if ((rssi > 64) and (rssi <= 74)) return 15;  // S9 +50
-    if  (rssi > 74)                   return 16;  // S9 +60
-    if  (rssi > 76)                   return 17;  //>S9 +60
-    // newStereoPilot=si4735.getCurrentPilot();
-  }
-  return 1;
+
+    if (currentMode != FM) {
+        // dBuV to S point conversion HF
+        if (rssi <= 1) return 1;                    // S0
+        if (rssi > 1 && rssi <= 2) return 2;        // S1   (G8PTN: table corrigée)
+        if (rssi > 2 && rssi <= 3) return 3;        // S2
+        if (rssi > 3 && rssi <= 4) return 4;        // S3
+        if (rssi > 4 && rssi <= 10) return 5;       // S4
+        if (rssi > 10 && rssi <= 16) return 6;      // S5
+        if (rssi > 16 && rssi <= 22) return 7;      // S6
+        if (rssi > 22 && rssi <= 28) return 8;      // S7
+        if (rssi > 28 && rssi <= 34) return 9;      // S8
+        if (rssi > 34 && rssi <= 44) return 10;     // S9
+        if (rssi > 44 && rssi <= 54) return 11;     // S9 +10
+        if (rssi > 54 && rssi <= 64) return 12;     // S9 +20
+        if (rssi > 64 && rssi <= 74) return 13;     // S9 +30
+        if (rssi > 74 && rssi <= 84) return 14;     // S9 +40
+        if (rssi > 84 && rssi <= 94) return 15;     // S9 +50
+        if (rssi > 95)               return 17;     // >S9 +60
+        if (rssi > 94)               return 16;     // S9 +60
+    }
+    else {
+        // dBuV to S point conversion FM
+        if (rssi <= 1) return 1;                   // S1
+        if (rssi > 1 && rssi <= 2) return 7;       // S6
+        if (rssi > 2 && rssi <= 8) return 8;       // S7
+        if (rssi > 8 && rssi <= 14) return 9;      // S8
+        if (rssi > 14 && rssi <= 24) return 10;    // S9
+        if (rssi > 24 && rssi <= 34) return 11;    // S9 +10
+        if (rssi > 34 && rssi <= 44) return 12;    // S9 +20
+        if (rssi > 44 && rssi <= 54) return 13;    // S9 +30
+        if (rssi > 54 && rssi <= 64) return 14;    // S9 +40
+        if (rssi > 64 && rssi <= 74) return 15;    // S9 +50
+        if (rssi > 76)               return 17;    // >S9 +60
+        if (rssi > 74)               return 16;    // S9 +60
+    }
+    return 1;
 }
+
 
 // G8PTN: Alternative layout
 void drawMenu() {
@@ -3353,7 +3352,7 @@ void loop() {
   }
 
   if ((millis() - lastRDSCheck) > RDS_CHECK_TIME) {
-    if ((currentMode == FM) and (snr >= 12)) checkRDS();
+    if ((currentMode == FM) && (snr >= 12)) checkRDS();
     lastRDSCheck = millis();
   }
 
