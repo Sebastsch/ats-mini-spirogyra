@@ -434,7 +434,7 @@ const ColorTheme theme[] = {
     0xDEFA, // text_muted
     0xFA86, // text_warn
     0xFDC8, // smeter_icon
-    0xFDC8, // smeter_bar
+    0xFBC8, // smeter_bar
     0xFDC8, // smeter_bar_plus
     0x4535, // save_icon
     0xFDE8, // batt_voltage
@@ -458,7 +458,7 @@ const ColorTheme theme[] = {
     0xFDE8, // menu_hdr
     0x4D15, // menu_item
     0x2A2C, // menu_hl_bg
-    0xFDE8, // menu_hl_text
+    0xFBC8, // menu_hl_text
     0xDEFA, // menu_param
     0xFDE8, // freq_text
     0xDEFA, // funit_text
