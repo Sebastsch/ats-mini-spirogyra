@@ -2052,15 +2052,13 @@ void drawMenu() {
 
 /* Draw stereo indicator. */
 void drawStereoIndicator(uint16_t x, uint16_t y, uint16_t r, uint16_t color_stereo, uint16_t color_mono, boolean stereo) {
-      if (stereo) {
-        // Stereo: two intertwined circles.
-        spr.drawSmoothCircle(x - r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
-        spr.drawSmoothCircle(x + r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
-      }
-      else {
-        // Mono: one white circle.
-        spr.drawSmoothCircle (x, y, r, theme[themeIdx].Mono_icon, theme[themeIdx].menu_bg);
-      }
+  spr.fillRect(x - r, y - r, 2 * r, 2 * r, theme[themeIdx].bg);
+  if (stereo) {
+    spr.drawSmoothCircle(x - r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
+    spr.drawSmoothCircle(x + r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
+  } else {
+    spr.drawSmoothCircle(x, y, r, theme[themeIdx].Mono_icon, theme[themeIdx].menu_bg);
+  }
 }
 
 void drawSprite()
@@ -2226,25 +2224,24 @@ void drawSprite()
     }
 
     // --- New Version of the S-Meter ---
+    int barWidth  = 100;  // maximum width
+    int barHeight = 4;    // bar height
     
-int barWidth  = 100;  // maximum width
-int barHeight = 4;    // bar height
-    
-int barX = meter_offset_x;
-int barY = meter_offset_y;
+    int barX = meter_offset_x;
+    int barY = meter_offset_y;
 
-int strength = getStrength();
-int fillWidth = ((strength - 1) * barWidth) / 16;
+    int strength = getStrength();
+    int fillWidth = ((strength - 1) * barWidth) / 16;
     
-spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
-const char* labelText = "1•3•5•7•9•+10•+20•+30";
+    spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
+    const char* labelText = "1•3•5•7•9•+10•+20•+30";
 
-spr.setFreeFont(&PixelOperator8pt7b);
-spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
-int labelWidth = spr.textWidth(labelText);
-int labelX = barX + (barWidth - labelWidth) / 2;
-int labelY = barY + barHeight + 4;
-spr.drawString(labelText, labelX, labelY, 1);
+    spr.setFreeFont(&PixelOperator8pt7b);
+    spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
+    int labelWidth = spr.textWidth(labelText);
+    int labelX = barX + (barWidth - labelWidth) / 2;
+    int labelY = barY + barHeight + 4;
+    spr.drawString(labelText, labelX, labelY, 1);
 
     
     
@@ -2276,6 +2273,7 @@ spr.drawString(labelText, labelX, labelY, 1);
     //  }
 
       spr.setTextDatum(MR_DATUM);
+      spr.fillRect(rds_offset_x, rds_offset_y - 2, 150, 20, theme[themeIdx].bg);
       spr.setFreeFont(&Technology10pt7b);
       spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
       //spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
@@ -2292,6 +2290,9 @@ if (currentMode == FM) {
   char line1[max_line_len + 1];
   char line2[max_line_len + 1];
 
+
+
+  spr.fillRect(rdsmess_offset_x, rdsmess_offset_y, 200, 40, theme[themeIdx].bg);
   int len = strlen(bufferRdsMsg);
   
   if (len <= max_line_len) {
