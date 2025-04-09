@@ -2744,42 +2744,39 @@ void showAbout() {
 }
 
 
-void doSleep( uint16_t v ) {
-  if ( v == 1) {
-    currentSleep = currentSleep + 5;
-    if (currentSleep > 255) currentSleep = 255;
-  } else {
-    if (currentSleep >= 5) currentSleep = currentSleep - 5;
-    else currentSleep = 0;
-  }
-
-  showSleep();
-}
-
-
-void showSleep() {
-  drawSprite();
-}
-
-
-void doEcomode(int8_t v) {
+void doSleep(int8_t v) {
   if (v == 1) {
     ecomodeTimeout += ECOMODE_STEP;
     if (ecomodeTimeout > MAX_ECOMODE_TIMEOUT)
       ecomodeTimeout = MAX_ECOMODE_TIMEOUT;
-  } else { // v == -1
+  } else {
     if (ecomodeTimeout < ECOMODE_STEP)
       ecomodeTimeout = MIN_ECOMODE_TIMEOUT;
     else
       ecomodeTimeout -= ECOMODE_STEP;
   }
-  showEcomode();
+  showSleep();
+}
+void showSleep() {
+  drawSprite();
 }
 
 
+void doEcomode(uint16_t v) {
+  if (v == 1)
+    currentSleep = currentSleep + 5;
+  else {
+    if (currentSleep >= 5)
+      currentSleep = currentSleep - 5;
+    else
+      currentSleep = 0;
+  }
+  showEcomode();
+}
 void showEcomode() {
   drawSprite();
 }
+
 
 
 void doTheme( uint16_t v ) {
@@ -2794,6 +2791,7 @@ void doTheme( uint16_t v ) {
 void showTheme() {
   drawSprite();
 }
+
 
 void doAvc(int16_t v) {
   // Only allow for AM and SSB modes
@@ -3290,21 +3288,21 @@ void loop() {
     }
   }
 
-  // Display sleep timeout
-  if (currentSleep && display_on) {
-    if ((millis() - elapsedSleep) > currentSleep * 1000) {
-      displayOff();
-    }
-  }
 
-  // ECO Mode Verification: Implemented verification for the ECO mode feature,
-  // which uses the Deep Sleep function. Ensures correct behavior during
-  // scheduled sleep intervals (60 to 180 minutes).
-  if (ecomodeTimeout > 0) {
-    if ((millis() - elapsedEcomode) > ecomodeTimeout * 60000UL) {
-    espDeepSleep();  // On passe en deep sleep
+  
+if (currentSleep && display_on) {
+  if ((millis() - elapsedSleep) > currentSleep * 1000) {
+    displayOff();
   }
 }
+
+if (ecomodeTimeout > 0 && display_on) {
+  if ((millis() - elapsedEcomode) > ecomodeTimeout * 60000UL) {
+    espDeepSleep();
+  }
+}
+
+  
 
   // Show RSSI status only if this condition has changed
   if ((millis() - elapsedRSSI) > MIN_ELAPSED_RSSI_TIME * 6)
