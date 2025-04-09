@@ -3335,15 +3335,14 @@ void loop() {
   }
 
 
-
-
   // Vérification dans loop() pour le mode ECO (deep sleep)
-if (ecomodeTimeout > 0 && display_on) {
-  if ((millis() - elapsedEcomode) > ecomodeTimeout * 60000UL) {
+  if (ecomodeTimeout > 0) {
+    if ((millis() - elapsedEcomode) > ecomodeTimeout * 60000UL) {
     espDeepSleep();  // On passe en deep sleep
   }
 }
-  
+
+
 
   
 
