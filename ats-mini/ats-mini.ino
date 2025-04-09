@@ -2032,16 +2032,15 @@ void drawMenu() {
       spr.drawNumber(currentBrt,40+menu_offset_x+(menu_delta_x/2),60+menu_offset_y,4);
     }
 
-    //In this code, the behavior of the two settings, “Sleep” and “Ecomode,” is inverted compared to what their labels suggest in the interface.
     if (cmdSleep) {
       spr.setTextColor(theme[themeIdx].menu_param,theme[themeIdx].menu_bg);
       spr.fillRoundRect(6+menu_offset_x,24+menu_offset_y+(2*16),66+menu_delta_x,16,2,theme[themeIdx].menu_bg);
-      spr.drawNumber(ecomodeTimeout, 40+menu_offset_x+(menu_delta_x/2),60+menu_offset_y,4);
+      spr.drawNumber(currentSleep,40+menu_offset_x+(menu_delta_x/2),60+menu_offset_y,4);
     }
     if (cmdEcomode) {
       spr.setTextColor(theme[themeIdx].menu_param, theme[themeIdx].menu_bg);
       spr.fillRoundRect(6 + menu_offset_x, 24 + menu_offset_y + (2 * 16), 66 + menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
-      spr.drawNumber(currentSleep, 40 + menu_offset_x + (menu_delta_x / 2), 60 + menu_offset_y, 4);
+      spr.drawNumber(ecomodeTimeout, 40 + menu_offset_x + (menu_delta_x / 2), 60 + menu_offset_y, 4);
     }
   }
 }
@@ -2282,9 +2281,6 @@ void drawSprite()
       const int max_line_len = 30;
       char line1[max_line_len + 1];
       char line2[max_line_len + 1];
-
-      int len = strlen(bufferRdsMsg);
-      
       if (len <= max_line_len) {
         strncpy(line1, bufferRdsMsg, max_line_len);
         line1[len] = '\0';
@@ -2745,39 +2741,42 @@ void showAbout() {
 }
 
 
-void doSleep(int8_t v) {
-  if (v == 1) {
-    ecomodeTimeout += ECOMODE_STEP;
-    if (ecomodeTimeout > MAX_ECOMODE_TIMEOUT)
-      ecomodeTimeout = MAX_ECOMODE_TIMEOUT;
+void doSleep( uint16_t v ) {
+  if ( v == 1) {
+    currentSleep = currentSleep + 5;
+    if (currentSleep > 255) currentSleep = 255;
   } else {
-    if (ecomodeTimeout < ECOMODE_STEP)
-      ecomodeTimeout = MIN_ECOMODE_TIMEOUT;
-    else
-      ecomodeTimeout -= ECOMODE_STEP;
+    if (currentSleep >= 5) currentSleep = currentSleep - 5;
+    else currentSleep = 0;
   }
+
   showSleep();
 }
+
+
 void showSleep() {
   drawSprite();
 }
 
 
-void doEcomode(uint16_t v) {
-  if (v == 1)
-    currentSleep = currentSleep + 5;
-  else {
-    if (currentSleep >= 5)
-      currentSleep = currentSleep - 5;
+void doEcomode(int8_t v) {
+  if (v == 1) {
+    ecomodeTimeout += ECOMODE_STEP;
+    if (ecomodeTimeout > MAX_ECOMODE_TIMEOUT)
+      ecomodeTimeout = MAX_ECOMODE_TIMEOUT;
+  } else { // v == -1
+    if (ecomodeTimeout < ECOMODE_STEP)
+      ecomodeTimeout = MIN_ECOMODE_TIMEOUT;
     else
-      currentSleep = 0;
+      ecomodeTimeout -= ECOMODE_STEP;
   }
   showEcomode();
 }
+
+
 void showEcomode() {
   drawSprite();
 }
-
 
 
 void doTheme( uint16_t v ) {
@@ -2792,7 +2791,6 @@ void doTheme( uint16_t v ) {
 void showTheme() {
   drawSprite();
 }
-
 
 void doAvc(int16_t v) {
   // Only allow for AM and SSB modes
@@ -3289,21 +3287,21 @@ void loop() {
     }
   }
 
+  // Display sleep timeout
+  if (currentSleep && display_on) {
+    if ((millis() - elapsedSleep) > currentSleep * 1000) {
+      displayOff();
+    }
+  }
 
-  
-if (currentSleep && display_on) {
-  if ((millis() - elapsedSleep) > currentSleep * 1000) {
-    displayOff();
+  // ECO Mode Verification: Implemented verification for the ECO mode feature,
+  // which uses the Deep Sleep function. Ensures correct behavior during
+  // scheduled sleep intervals (60 to 180 minutes).
+  if (ecomodeTimeout > 0) {
+    if ((millis() - elapsedEcomode) > ecomodeTimeout * 60000UL) {
+    espDeepSleep();  // On passe en deep sleep
   }
 }
-
-if (ecomodeTimeout > 0 && display_on) {
-  if ((millis() - elapsedEcomode) > ecomodeTimeout * 60000UL) {
-    espDeepSleep();
-  }
-}
-
-  
 
   // Show RSSI status only if this condition has changed
   if ((millis() - elapsedRSSI) > MIN_ELAPSED_RSSI_TIME * 6)
@@ -3550,6 +3548,13 @@ if (ecomodeTimeout > 0 && display_on) {
 
         default:
           break;
+    }
+  }
+#endif
+
+  // Add a small default delay in the main loop
+  delay(5);
+}reak;
     }
   }
 #endif
