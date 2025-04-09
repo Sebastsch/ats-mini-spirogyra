@@ -3320,12 +3320,11 @@ void loop() {
           drawSprite();
         }
       }
-      delay(MIN_ELAPSED_TIME); // waits a little more for releasing the button.
+      delay(MIN_ELAPSED_TIME); // Pause avant reprise
       elapsedSleep = elapsedCommand = millis();
-      // Réinitialisation des minuteries d'activité
-      elapsedEcomode = millis();
+  // Ne pas réinitialiser elapsedEcomode ici afin que le timer Ecomode continue de décompter
+  // elapsedEcomode = millis();
     }
-  }
 
   // Display sleep timeout
   if (currentSleep && display_on) {
