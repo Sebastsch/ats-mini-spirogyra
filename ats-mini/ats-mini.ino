@@ -2032,15 +2032,16 @@ void drawMenu() {
       spr.drawNumber(currentBrt,40+menu_offset_x+(menu_delta_x/2),60+menu_offset_y,4);
     }
 
+    //In this code, the behavior of the two settings, “Sleep” and “Ecomode,” is inverted compared to what their labels suggest in the interface.
     if (cmdSleep) {
       spr.setTextColor(theme[themeIdx].menu_param,theme[themeIdx].menu_bg);
       spr.fillRoundRect(6+menu_offset_x,24+menu_offset_y+(2*16),66+menu_delta_x,16,2,theme[themeIdx].menu_bg);
-      spr.drawNumber(currentSleep,40+menu_offset_x+(menu_delta_x/2),60+menu_offset_y,4);
+      spr.drawNumber(ecomodeTimeout, 40+menu_offset_x+(menu_delta_x/2),60+menu_offset_y,4);
     }
     if (cmdEcomode) {
       spr.setTextColor(theme[themeIdx].menu_param, theme[themeIdx].menu_bg);
       spr.fillRoundRect(6 + menu_offset_x, 24 + menu_offset_y + (2 * 16), 66 + menu_delta_x, 16, 2, theme[themeIdx].menu_bg);
-      spr.drawNumber(ecomodeTimeout, 40 + menu_offset_x + (menu_delta_x / 2), 60 + menu_offset_y, 4);
+      spr.drawNumber(currentSleep, 40 + menu_offset_x + (menu_delta_x / 2), 60 + menu_offset_y, 4);
     }
   }
 }
