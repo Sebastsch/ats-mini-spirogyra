@@ -3324,6 +3324,8 @@ void loop() {
       elapsedSleep = elapsedCommand = millis();
   // Ne pas réinitialiser elapsedEcomode ici afin que le timer Ecomode continue de décompter
   // elapsedEcomode = millis();
+    }
+  }
 
   // Display sleep timeout
   if (currentSleep && display_on) {
