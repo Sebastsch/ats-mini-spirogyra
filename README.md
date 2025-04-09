@@ -29,8 +29,9 @@ Changes :
 
 ### 9/04/25
 * Added Modern theme
-* In the Settings menu : added a proper sleep function leveraging Deep Sleep mode (Allows scheduling from 60 to 180 minutes.)
-// The feature is temporarily named Ecomode.
+* In the Settings menu : added a proper sleep function leveraging Deep Sleep mode (Allows scheduling from 60 to 180 minutes.). In this code, the behavior of the two settings, “Sleep” and “Ecomode,” is inverted compared to what their labels suggest in the interface.
+
+
 
 # Releases
 
