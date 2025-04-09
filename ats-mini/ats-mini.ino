@@ -118,13 +118,9 @@
 
 
 // Ecomode
-#define MIN_ECOMODE_TIMEOUT 0    // 0 minute (désactivé)
-#define MAX_ECOMODE_TIMEOUT 180  // 180 minutes maximum
-#define ECOMODE_STEP 30          // Incrément par 30 minutes
-
-// La durée de l'ecomode en minutes, initialisée à 0 à chaque démarrage.
-uint16_t ecomodeTimeout = 0;
-
+#define MIN_ECOMODE_TIMEOUT 0
+#define MAX_ECOMODE_TIMEOUT 180
+#define ECOMODE_STEP 30
 
 // Band Types
 #define FM_BAND_TYPE 0
@@ -292,9 +288,9 @@ int8_t currentAVC = 48;                 // Selected AVC, range = 12 to 90 in ste
 uint16_t currentSleep = 30;             // Display sleep timeout, range = 0 to 255 in steps of 5
 long elapsedSleep = millis();           // Display sleep timer
 
-
-unsigned long elapsedEcomode = millis();  // Minuteur pour l'ecomode
-
+// Ecomode
+uint16_t ecomodeTimeout = 0;
+unsigned long elapsedEcomode = millis();
 
 
 // Background screen refresh
@@ -1810,7 +1806,6 @@ void doCurrentMenuCmd() {
 }
 
 
-// Exemple dans doCurrentSettingsMenuCmd()
 void doCurrentSettingsMenuCmd() {
   disableCommands();
   switch (currentSettingsMenuCmd) {
@@ -1826,7 +1821,7 @@ void doCurrentSettingsMenuCmd() {
       cmdTheme = true;
       showTheme();
       break;
-    case MENU_ECOMODE:  // Assurez-vous d'avoir défini MENU_ECOMODE correctement selon votre index
+    case MENU_ECOMODE:
       cmdEcomode = true;
       showEcomode();
       break;
@@ -2050,7 +2045,7 @@ void drawMenu() {
   }
 }
 
-/* Draw stereo indicator. */
+//Stereo indicator circle.
 void drawStereoIndicator(uint16_t x, uint16_t y, uint16_t r, uint16_t color_stereo, uint16_t color_mono, boolean stereo) {
   spr.fillRect(x - r, y - r, 2 * r, 2 * r, theme[themeIdx].bg);
   if (stereo) {
@@ -2233,7 +2228,7 @@ void drawSprite()
     int strength = getStrength();
     int fillWidth = ((strength - 1) * barWidth) / 16;
     
-    spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
+    //spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
     const char* labelText = "1•3•5•7•9•+10•+20•+30";
 
     spr.setFreeFont(&PixelOperator8pt7b);
@@ -2246,16 +2241,16 @@ void drawSprite()
     
     
 
-// S-Meter  
-// spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
-// spr.drawLine(meter_offset_x + 6, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 14, theme[themeIdx].smeter_icon);
-// for(int i=0; i<getStrength(); i++) {
-//   if (i<10) {
-//     spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar);
-//    } else {
-//      spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar_plus);
-//     }
-//   }
+    //S-Meter
+    //spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
+    //spr.drawLine(meter_offset_x + 6, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 14, theme[themeIdx].smeter_icon);
+    //for(int i=0; i<getStrength(); i++) {
+    //  if (i<10) {
+    //    spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar);
+    //  } else {
+    //    spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar_plus);
+    //  }
+    //}
 
     
     //Icone Stereo
@@ -2266,66 +2261,58 @@ void drawSprite()
 
 
     
-// RDS Station
+    // RDS Station
     if (currentMode == FM) {
       //if (rx.getCurrentPilot()) {
       //  spr.fillRect(15 + meter_offset_x, 7+meter_offset_y, 4*17, 2, theme[themeIdx].bg);
-    //  }
+      //}
+        spr.setTextDatum(MR_DATUM);
+        //spr.fillRect(rds_offset_x, rds_offset_y - 2, 150, 20, theme[themeIdx].bg);
+        spr.setFreeFont(&Technology10pt7b);
+        spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
+        spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
+        spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
+      }
 
-      spr.setTextDatum(MR_DATUM);
-      spr.fillRect(rds_offset_x, rds_offset_y - 2, 150, 20, theme[themeIdx].bg);
-      spr.setFreeFont(&Technology10pt7b);
+    if (currentMode == FM) {
+      spr.setTextDatum(TL_DATUM);
+      spr.setFreeFont(&PixelOperator8pt7b);
       spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
-      //spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
-      spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
-    }
-
-if (currentMode == FM) {
-  // Configuration de l'affichage
-  spr.setTextDatum(TL_DATUM);
-  spr.setFreeFont(&PixelOperator8pt7b);
-  spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
-
-  const int max_line_len = 30;
-  char line1[max_line_len + 1];
-  char line2[max_line_len + 1];
-
-
-
-  spr.fillRect(rdsmess_offset_x, rdsmess_offset_y, 200, 40, theme[themeIdx].bg);
-  int len = strlen(bufferRdsMsg);
+      const int max_line_len = 30;
+      char line1[max_line_len + 1];
+      char line2[max_line_len + 1];
+      if (len <= max_line_len) {
+        strncpy(line1, bufferRdsMsg, max_line_len);
+        line1[len] = '\0';
+        line2[0] = '\0';
+      } 
+      else {
+        int breakIndex = max_line_len;
+        while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
+          breakIndex--;
+        }
+        if (breakIndex == 0) {
+          breakIndex = max_line_len;
+        }
   
-  if (len <= max_line_len) {
-    strncpy(line1, bufferRdsMsg, max_line_len);
-    line1[len] = '\0';
-    line2[0] = '\0';
-  } else {
-    int breakIndex = max_line_len;
-    while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
-      breakIndex--;
-    }
-    if (breakIndex == 0) {
-      breakIndex = max_line_len;
-    }
-  
-    strncpy(line1, bufferRdsMsg, breakIndex);
-    line1[breakIndex] = '\0';
+        strncpy(line1, bufferRdsMsg, breakIndex);
+        line1[breakIndex] = '\0';
     
-    int startSecondLine = breakIndex;
-    while (bufferRdsMsg[startSecondLine] == ' ' && startSecondLine < len) {
-      startSecondLine++;
-    }
+        int startSecondLine = breakIndex;
+        while (bufferRdsMsg[startSecondLine] == ' ' && startSecondLine < len) {
+          startSecondLine++;
+        }
     
-    strncpy(line2, bufferRdsMsg + startSecondLine, max_line_len);
-    line2[max_line_len] = '\0';
-  }
+        strncpy(line2, bufferRdsMsg + startSecondLine, max_line_len);
+        line2[max_line_len] = '\0';
+      }
   
-  spr.drawString(line1, rdsmess_offset_x, rdsmess_offset_y);
-  if (strlen(line2) > 0) {
-    int lineSpacing = 13;
-    spr.drawString(line2, rdsmess_offset_x, rdsmess_offset_y + lineSpacing);
-  }
-}
+      spr.drawString(line1, rdsmess_offset_x, rdsmess_offset_y);
+      if (strlen(line2) > 0) {
+        int lineSpacing = 13;
+        spr.drawString(line2, rdsmess_offset_x, rdsmess_offset_y + lineSpacing);
+      }
+    }
     
 
     if (isCB()) {
@@ -2381,7 +2368,6 @@ if (currentMode == FM) {
 #endif
 
 }
-
 
 void cleanBfoRdsInfo()
 {
@@ -2743,14 +2729,17 @@ void doBrt( uint16_t v ) {
   showBrt();
 }
 
+
 void showBrt()
 {
 drawSprite();
 }
 
+
 void showAbout() {
   drawSprite();
 }
+
 
 void doSleep( uint16_t v ) {
   if ( v == 1) {
@@ -2764,14 +2753,13 @@ void doSleep( uint16_t v ) {
   showSleep();
 }
 
+
 void showSleep() {
   drawSprite();
 }
 
 
-
 void doEcomode(int8_t v) {
-  // v == 1 pour incrémenter, v == -1 pour décrémenter.
   if (v == 1) {
     ecomodeTimeout += ECOMODE_STEP;
     if (ecomodeTimeout > MAX_ECOMODE_TIMEOUT)
@@ -2782,29 +2770,13 @@ void doEcomode(int8_t v) {
     else
       ecomodeTimeout -= ECOMODE_STEP;
   }
-  showEcomode();  // Met à jour l'affichage de la valeur
+  showEcomode();
 }
-
-
 
 
 void showEcomode() {
-  // Ici on rafraîchit l'écran en dessinant toute l'interface ou en le recadrant
   drawSprite();
 }
-
-  // On affiche l'option ECO Mode en indiquant la durée sélectionnée
-//  spr.setTextDatum(MC_DATUM); // Centre le texte
-//  spr.fillSmoothRoundRect(80,40,160,40,4,theme[themeIdx].text);
-//  spr.fillSmoothRoundRect(81,41,158,38,4,theme[themeIdx].menu_bg);
-
-//  char buf[20];
-//  sprintf(buf, "Ecomode: %d min", ecomodeTimeout);
-//  spr.drawString(buf, 160, 62, 4);  // La position et la taille (2) sont adaptables
-
-//  spr.pushSprite(0, 0);
-//}
-
 
 
 void doTheme( uint16_t v ) {
@@ -2986,7 +2958,7 @@ void displayOn() {
 
 
 void espDeepSleep() {
-  displayOff();  // Éteindre l'affichage avant de passer en mode deep sleep
+  displayOff();  // Turn off the display before entering deep sleep mode.
   Serial.println("Entering deep sleep mode");  
   esp_deep_sleep_start();
 }
@@ -3165,7 +3137,7 @@ void loop() {
       doBrt(encoderCount);
     else if (cmdSleep)
       doSleep(encoderCount);
-    else if (cmdEcomode)       // Ajout de cette branche pour Eco Mode
+    else if (cmdEcomode)
       doEcomode(encoderCount);
     else if (cmdTheme)
       doTheme(encoderCount);
@@ -3269,17 +3241,6 @@ void loop() {
       elapsedSleep = millis();
     } 
     
-    
-//    else if (cmdEco) {
-//      doEcoMode(encoderCount);
-//      encoderCount = 0;
-//      resetEepromDelay();
-//)      elapsedSleep = elapsedCommand = millis();
-//   }
-    
-    
-    
-    
     else if (pb1_short_released && display_on && !seekModePress) {
       pb1_released = pb1_short_released = pb1_long_released = false;
       if (muted) {
@@ -3321,10 +3282,8 @@ void loop() {
           drawSprite();
         }
       }
-      delay(MIN_ELAPSED_TIME); // Pause avant reprise
+      delay(MIN_ELAPSED_TIME);
       elapsedSleep = elapsedCommand = millis();
-  // Ne pas réinitialiser elapsedEcomode ici afin que le timer Ecomode continue de décompter
-  // elapsedEcomode = millis();
     }
   }
 
@@ -3335,17 +3294,14 @@ void loop() {
     }
   }
 
-
-  // Vérification dans loop() pour le mode ECO (deep sleep)
+  // ECO Mode Verification: Implemented verification for the ECO mode feature,
+  // which uses the Deep Sleep function. Ensures correct behavior during
+  // scheduled sleep intervals (60 to 180 minutes).
   if (ecomodeTimeout > 0) {
     if ((millis() - elapsedEcomode) > ecomodeTimeout * 60000UL) {
     espDeepSleep();  // On passe en deep sleep
   }
 }
-
-
-
-  
 
   // Show RSSI status only if this condition has changed
   if ((millis() - elapsedRSSI) > MIN_ELAPSED_RSSI_TIME * 6)
