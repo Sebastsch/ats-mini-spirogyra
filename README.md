@@ -27,6 +27,11 @@ Changes :
 * Moved EEPROM logo to bottom-right corner
 * New S-meter (test version)
 
+### 9/04/25
+* Added Modern theme
+* In the Settings menu : added a proper sleep function leveraging Deep Sleep mode (Allows scheduling from 60 to 180 minutes.)
+// The feature is temporarily named Ecomode.
+
 # Releases
 
 Check out the [Releases](https://github.com/Sebastsch/ats-mini-spirogyra/releases/tag/V1.08.01) page.
