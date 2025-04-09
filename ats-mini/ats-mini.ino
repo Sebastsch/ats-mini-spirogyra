@@ -2228,7 +2228,7 @@ void drawSprite()
     int strength = getStrength();
     int fillWidth = ((strength - 1) * barWidth) / 16;
     
-    //spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
+    spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
     const char* labelText = "1•3•5•7•9•+10•+20•+30";
 
     spr.setFreeFont(&PixelOperator8pt7b);
