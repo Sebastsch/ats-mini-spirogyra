@@ -2047,15 +2047,30 @@ void drawMenu() {
 }
 
 //Stereo indicator circle.
-void drawStereoIndicator(uint16_t x, uint16_t y, uint16_t r, uint16_t color_stereo, uint16_t color_mono, boolean stereo) {
+//void drawStereoIndicator(uint16_t x, uint16_t y, uint16_t r, uint16_t color_stereo, uint16_t color_mono, boolean stereo) {
+//  spr.fillRect(x - r, y - r, 2 * r, 2 * r, theme[themeIdx].bg);
+//  if (stereo) {
+//    spr.drawSmoothCircle(x - r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
+//    spr.drawSmoothCircle(x + r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
+//  } else {
+//    spr.drawSmoothCircle(x, y, r, theme[themeIdx].Mono_icon, theme[themeIdx].menu_bg);
+//  }
+//}
+
+
+
+void drawStereoIndicatorOptimized(uint16_t x, uint16_t y, uint16_t r, boolean stereo) {
   spr.fillRect(x - r, y - r, 2 * r, 2 * r, theme[themeIdx].bg);
   if (stereo) {
-    spr.drawSmoothCircle(x - r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
-    spr.drawSmoothCircle(x + r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
-  } else {
-    spr.drawSmoothCircle(x, y, r, theme[themeIdx].Mono_icon, theme[themeIdx].menu_bg);
+    spr.drawCircle(x - r / 2, y, r, theme[themeIdx].Ster_icon);
+    spr.drawCircle(x + r / 2, y, r, theme[themeIdx].Ster_icon);
+  } 
+  else {
+    spr.drawCircle(x, y, r, theme[themeIdx].Mono_icon);
   }
 }
+
+
 
 void drawSprite()
 {
@@ -2254,13 +2269,10 @@ void drawSprite()
     //}
 
     
-    //Icone Stereo
-    if (currentMode == FM) 
-    {
+    // Icone Stereo
+    if (currentMode == FM) {
       drawStereoIndicator(MODE_OFFSET_X, MODE_OFFSET_Y, MODE_RADIUS, TFT_RED, TFT_WHITE, rx.getCurrentPilot());
     }
-
-
     
     // RDS Station
     if (currentMode == FM) {
