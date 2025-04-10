@@ -10,11 +10,14 @@
 #include "patch_init.h"            // SSB patch for whole SSBRX initialization string
 #include "esp_sleep.h"
 #include "poxel_font16pt7b.h"      // Font1 Band display
-#include "Technology10pt7b.h"      // Font2 RDS Station
+#include "alarm_clock9pt7b.h"      // Font2 RDS Station
 #include "PixelOperator8p.h"       // Font3 RDS Message
+#include "PixelOperator8pt7b.h"     // Font4 s-metre
 
 
-// =================================
+// ==========================e[themeIdx].bg);
+        spr.setFreeFont(&alarm_clock9pt7b);
+        spr.setTextColor(theme[themeIdx].rds_text, theme[=======
 // PIN DEFINITIONS
 // =================================
 
@@ -2235,7 +2238,7 @@ void drawSprite()
     spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
     const char* labelText = "1•3•5•7•9•+10•+20•+30";
 
-    spr.setFreeFont(&PixelOperator8pt7b);
+    spr.setFreeFont(&PixelOperator8pt7b):
     spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
     int labelWidth = spr.textWidth(labelText);
     int labelX = barX + (barWidth - labelWidth) / 2;
@@ -2246,15 +2249,14 @@ void drawSprite()
     
 
     //S-Meter
-    //spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
-    //spr.drawLine(meter_offset_x + 6, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 14, theme[themeIdx].smeter_icon);
-    //for(int i=0; i<getStrength(); i++) {
-    //  if (i<10) {
-    //    spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar);
-    //  } else {
-    //    spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar_plus);
-    //  }
-    //}
+//    spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
+//    spr.drawLine(meter_offset_x + 6, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 14, theme[themeIdx].smeter_icon);    for(int i=0; i<getStrength(); i++) {
+//      if (i<10) {
+//        spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar);
+//      } else {
+//        spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar_plus);
+//      }
+//    }
 
     //Icone Stereo
     if (currentMode == FM) {
@@ -2268,7 +2270,7 @@ void drawSprite()
       //}
         spr.setTextDatum(MR_DATUM);
         //spr.fillRect(rds_offset_x, rds_offset_y - 2, 150, 20, theme[themeIdx].bg);
-        spr.setFreeFont(&Technology10pt7b);
+        spr.setFreeFont(&alarm_clock9pt7b);
         spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
         //spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
         spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
