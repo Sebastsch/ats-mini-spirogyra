@@ -15,9 +15,6 @@
 #include "PixelOperator8pt7b.h"     // Font4 s-metre
 
 
-// ==========================e[themeIdx].bg);
-        spr.setFreeFont(&alarm_clock9pt7b);
-        spr.setTextColor(theme[themeIdx].rds_text, theme[=======
 // PIN DEFINITIONS
 // =================================
 
