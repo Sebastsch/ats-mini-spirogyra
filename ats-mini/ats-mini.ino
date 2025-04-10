@@ -155,6 +155,8 @@
 #endif
 
 // Settings Options
+//In the Settings menu : added a proper sleep function leveraging Deep Sleep mode (Allows scheduling from 60 to 180 minutes.). In this code, 
+//the behavior of the two settings, “Sleep” and “Ecomode,” is inverted compared to what their labels suggest in the interface.
 #define MENU_BRIGHTNESS   0
 #define MENU_SLEEP        3
 #define MENU_THEME        2
