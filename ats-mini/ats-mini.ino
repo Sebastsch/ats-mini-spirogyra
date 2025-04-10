@@ -2268,8 +2268,7 @@ void drawSprite()
     //  }
     //}
 
-    
-    // Icone Stereo
+    //Icone Stereo
     if (currentMode == FM) {
       drawStereoIndicator(MODE_OFFSET_X, MODE_OFFSET_Y, MODE_RADIUS, TFT_RED, TFT_WHITE, rx.getCurrentPilot());
     }
