@@ -2058,15 +2058,14 @@ void drawMenu() {
 //}
 
 
-
-void drawStereoIndicator(uint16_t x, uint16_t y, uint16_t r, boolean stereo) {
+void drawStereoIndicator(uint16_t x, uint16_t y, uint16_t r, bool stereo) {
   spr.fillRect(x - r, y - r, 2 * r, 2 * r, theme[themeIdx].bg);
   if (stereo) {
-    spr.drawCircle(x - r / 2, y, r, theme[themeIdx].Ster_icon);
-    spr.drawCircle(x + r / 2, y, r, theme[themeIdx].Ster_icon);
+    spr.drawSmoothCircle(x - r / 2, y, r, theme[themeIdx].Ster_icon);
+    spr.drawSmoothCircle(x + r / 2, y, r, theme[themeIdx].Ster_icon);
   } 
   else {
-    spr.drawCircle(x, y, r, theme[themeIdx].Mono_icon);
+    spr.drawSmoothCircle(x, y, r, theme[themeIdx].Mono_icon);
   }
 }
 
