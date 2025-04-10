@@ -2383,15 +2383,16 @@ void showRDSStation() {
 drawSprite();
 }
 
-void showRDSMsg()
-{
-  //rdsMsg[100] = bufferRdsMsg[100] = '\0';
-if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
-cleanBfoRdsInfo();
-strcpy(bufferRdsMsg, rdsMsg);
-drawSprite();
+void showRDSMsg() {
+  // Si le message n'a pas changé, inutile de rafraîchir
+  if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
+  
+  // Application de la transition douce entre l'ancien et le nouveau message
+  fadeRDSMsg(bufferRdsMsg, rdsMsg);
+  
+  // Mettez à jour le buffer avec le nouveau message
+  strcpy(bufferRdsMsg, rdsMsg);
 }
-
 
 
 // --- Fonction utilitaire pour simuler une "opacité" sur une couleur RVB565  ---
