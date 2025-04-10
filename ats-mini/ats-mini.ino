@@ -2454,7 +2454,7 @@ void fadeRDSMsg(const char* oldMsg, const char* newMsg) {
 
 // --- Exemple d'intégration dans la mise à jour du RDS ---
 // Supposons que vous ayez un buffer global pour le texte RDS déjà affiché :
-char bufferRdsMsg[100] = "";
+//char bufferRdsMsg[100] = "";
 
 void showRDSMsg() {
   // Si le message n'a pas changé, inutile de rafraîchir
