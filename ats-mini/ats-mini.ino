@@ -2373,7 +2373,27 @@ void drawSprite()
 
 void cleanBfoRdsInfo()
 {
-  bufferStationName[0]='\0';
+  bufferStationName[0] = '\0';
+  bufferRdsMsg[0] = '\0';
+}
+
+
+void showRDSStation()
+{
+  //stationName[50] = bufferStationName[50] = '\0';
+  if (strcmp(bufferStationName, stationName) == 0 ) return;
+  cleanBfoRdsInfo();
+  strcpy(bufferStationName, stationName);
+  drawSprite();
+}
+
+void showRDSMsg()
+{
+  //rdsMsg[100] = bufferRdsMsg[100] = '\0';
+  if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
+  cleanBfoRdsInfo();
+  strcpy(bufferRdsMsg, rdsMsg);
+  drawSprite();
 }
 
 void showRDSStation()
