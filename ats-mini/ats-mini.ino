@@ -2375,14 +2375,13 @@ void cleanBfoRdsInfo()
   bufferStationName[0]='\0';
 }
 
-//void showRDSStation()
-//{
-//  //stationName[50] = bufferStationName[50] = '\0';
-//  if (strcmp(bufferStationName, stationName) == 0 ) return;
-//  cleanBfoRdsInfo();
-//  strcpy(bufferStationName, stationName);
-//  drawSprite();
-//}
+void showRDSStation() {
+  //stationName[50] = bufferStationName[50] = '\0';
+  if (strcmp(bufferStationName, stationName) == 0 ) return;
+  cleanBfoRdsInfo();
+  strcpy(bufferStationName, stationName);
+drawSprite();
+}
 
 //void showRDSMsg()
 //{
