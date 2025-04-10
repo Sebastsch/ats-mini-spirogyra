@@ -2235,7 +2235,7 @@ void drawSprite()
     spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
     const char* labelText = "1•3•5•7•9•+10•+20•+30";
 
-    spr.setFreeFont(&PixelOperator8pt7b):
+    spr.setFreeFont(&PixelOperator8pt7b);
     spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
     int labelWidth = spr.textWidth(labelText);
     int labelX = barX + (barWidth - labelWidth) / 2;
