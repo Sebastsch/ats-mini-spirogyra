@@ -2273,9 +2273,9 @@ void drawSprite()
         spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
         //spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
         spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
-      }
+      //}
 
-    if (currentMode == FM) {
+    //if (currentMode == FM) {
       spr.setTextDatum(TL_DATUM);
       spr.setFreeFont(&PixelOperator8pt7b);
       spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
