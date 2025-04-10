@@ -736,7 +736,10 @@ void setup()
   // Attached pin to allows SI4732 library to mute audio as required to minimise loud clicks
   rx.setAudioMuteMcuPin(AUDIO_MUTE);
 
-  cleanBfoRdsInfo();
+  //cleanBfoRdsInfo();
+
+  cleanRdsStationInfo();
+  cleanRdsMsgInfo();
 
   delay(100);
 
@@ -1337,7 +1340,8 @@ void useBand() {
 
   rssi = 0;
   snr = 0;
-  cleanBfoRdsInfo();
+  cleanRdsStationInfo();
+  cleanRdsMsgInfo();
   showStatus();
 }
 
@@ -3212,7 +3216,8 @@ void loop() {
 
       rx.setFrequency(currentFrequency);                                   // Set new frequency
 
-      if (currentMode == FM) cleanBfoRdsInfo();
+      if (currentMode == FM) cleanRdsStationInfo();
+      if (currentMode == FM) cleanRdsMsgInfo();
 
       if (isCB()) checkCBChannel();
 
