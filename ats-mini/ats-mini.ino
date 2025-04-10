@@ -2059,7 +2059,7 @@ void drawMenu() {
 
 
 
-void drawStereoIndicatorOptimized(uint16_t x, uint16_t y, uint16_t r, boolean stereo) {
+void drawStereoIndicator(uint16_t x, uint16_t y, uint16_t r, boolean stereo) {
   spr.fillRect(x - r, y - r, 2 * r, 2 * r, theme[themeIdx].bg);
   if (stereo) {
     spr.drawCircle(x - r / 2, y, r, theme[themeIdx].Ster_icon);
