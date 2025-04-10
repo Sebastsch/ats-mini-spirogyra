@@ -11,9 +11,10 @@
 #include "esp_sleep.h"
 #include "poxel_font16pt7b.h"      // Font1 Band display
 #include "Technology10pt7b.h"      // Font2 RDS Station
-#include "PixelOperator8pt7b.h"    // Font3 RDS Message and S-meter
+#include "PixelOperator8pt7b.h"    // Font3 RDS Message
 
 
+// =================================
 // PIN DEFINITIONS
 // =================================
 
@@ -2047,17 +2048,14 @@ void drawMenu() {
 
 //Stereo indicator circle.
 void drawStereoIndicator(uint16_t x, uint16_t y, uint16_t r, uint16_t color_stereo, uint16_t color_mono, boolean stereo) {
-spr.fillRect(x - r, y - r, 2 * r, 2 * r, theme[themeIdx].bg);
-if (stereo) {
-spr.drawSmoothCircle(x - r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
-spr.drawSmoothCircle(x + r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
-} else {
-spr.drawSmoothCircle(x, y, r, theme[themeIdx].Mono_icon, theme[themeIdx].menu_bg);
+  spr.fillRect(x - r, y - r, 2 * r, 2 * r, theme[themeIdx].bg);
+  if (stereo) {
+    spr.drawSmoothCircle(x - r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
+    spr.drawSmoothCircle(x + r/2, y, r, theme[themeIdx].Ster_icon, theme[themeIdx].menu_bg);
+  } else {
+    spr.drawSmoothCircle(x, y, r, theme[themeIdx].Mono_icon, theme[themeIdx].menu_bg);
+  }
 }
-}
-
-
-
 
 void drawSprite()
 {
@@ -2244,20 +2242,25 @@ void drawSprite()
     
     
 
-//    //S-Meter
-//    spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
-//    spr.drawLine(meter_offset_x + 6, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 14, theme[themeIdx].smeter_icon);    for(int i=0; i<getStrength(); i++) {
-//      if (i<10) {
-//        spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar);
-//      } else {
-//        spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar_plus);
-//      }
-//    }
+    //S-Meter
+    //spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
+    //spr.drawLine(meter_offset_x + 6, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 14, theme[themeIdx].smeter_icon);
+    //for(int i=0; i<getStrength(); i++) {
+    //  if (i<10) {
+    //    spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar);
+    //  } else {
+    //    spr.fillRect(15+meter_offset_x + (i*4), 2+meter_offset_y, 2, 12, theme[themeIdx].smeter_bar_plus);
+    //  }
+    //}
 
+    
     //Icone Stereo
-    if (currentMode == FM) {
+    if (currentMode == FM) 
+    {
       drawStereoIndicator(MODE_OFFSET_X, MODE_OFFSET_Y, MODE_RADIUS, TFT_RED, TFT_WHITE, rx.getCurrentPilot());
     }
+
+
     
     // RDS Station
     if (currentMode == FM) {
@@ -2270,8 +2273,9 @@ void drawSprite()
         spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
         //spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
         spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
-    }
-//if (currentMode == FM) {
+      }
+    // RDS Message
+    if (currentMode == FM) {
       spr.setTextDatum(TL_DATUM);
       spr.setFreeFont(&PixelOperator8pt7b);
       spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
@@ -2285,7 +2289,7 @@ void drawSprite()
         line2[0] = '\0';
       } 
       else {
-       int breakIndex = max_line_len;
+        int breakIndex = max_line_len;
         while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
           breakIndex--;
         }
@@ -2372,12 +2376,13 @@ void cleanBfoRdsInfo()
   bufferStationName[0]='\0';
 }
 
-void showRDSStation() {
+void showRDSStation()
+{
   //stationName[50] = bufferStationName[50] = '\0';
   if (strcmp(bufferStationName, stationName) == 0 ) return;
   cleanBfoRdsInfo();
   strcpy(bufferStationName, stationName);
-drawSprite();
+  drawSprite();
 }
 
 void showRDSMsg()
@@ -2388,20 +2393,6 @@ void showRDSMsg()
   strcpy(bufferRdsMsg, rdsMsg);
   drawSprite();
 }
-
-
-void showRDSMsg() {
-  // Si le message n'a pas changé, inutile de rafraîchir
-  if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
-  
-  // Application de la transition douce entre l'ancien et le nouveau message
-  fadeRDSMsg(bufferRdsMsg, rdsMsg);
-  
-  // Mettez à jour le buffer avec le nouveau message
-  strcpy(bufferRdsMsg, rdsMsg);
-}
-
-
 
 //void showRDSTime()
 //{
