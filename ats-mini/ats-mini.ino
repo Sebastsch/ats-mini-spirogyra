@@ -2388,7 +2388,7 @@ drawSprite();
 //  if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
   
 //  // Application de la transition douce entre l'ancien et le nouveau message
-  fadeRDSMsg(bufferRdsMsg, rdsMsg);
+//  fadeRDSMsg(bufferRdsMsg, rdsMsg);
   
 //  // Mettez à jour le buffer avec le nouveau message
 //  strcpy(bufferRdsMsg, rdsMsg);
