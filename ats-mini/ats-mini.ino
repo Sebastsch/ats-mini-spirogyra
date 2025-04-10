@@ -2239,28 +2239,28 @@ int fillWidth = 0;
 // 2 pour S1, 4 pour S3, 6 pour S5, 8 pour S7, 10 pour S9, 12 pour +10, 14 pour +20, 16 pour +30, etc.
 if (strength <= 2) {
     // Niveau S1 
-    fillWidth = 10; // la barre s'arrête au-dessus du "1"
+    fillWidth = 5; // la barre s'arrête au-dessus du "1"
 } else if (strength <= 4) {
     // Niveau S3 
-    fillWidth = 30; // la barre s'arrête au-dessus du "3"
+    fillWidth = 11; // la barre s'arrête au-dessus du "3"
 } else if (strength <= 6) {
     // Niveau S5 : la barre va jusqu'au-dessus du "5"
-    fillWidth = 50;
+    fillWidth = 18;
 } else if (strength <= 8) {
     // Niveau S7 
-    fillWidth = 70;
+    fillWidth = 26;
 } else if (strength <= 10) {
     // Niveau S9 
-    fillWidth = 90;
+    fillWidth = 34;
 } else if (strength == 12) {
     // Niveau +10
-    fillWidth = 105;
+    fillWidth = 48;
 } else if (strength == 14) {
     // Niveau +20
-    fillWidth = 120;
+    fillWidth = 70;
 } else if (strength == 16) {
     // Niveau +30
-    fillWidth = 135;
+    fillWidth = 93;
 } else {
     // Par exemple, pour un RSSI équivalent à +40 (ou supérieur) :
     // Vous indiquez ici que, pour +40, la barre doit s'arrêter à la position du chiffre "4" dans le label "+40"
