@@ -2383,14 +2383,14 @@ void showRDSStation() {
 drawSprite();
 }
 
-//void showRDSMsg()
-//{
-//  //rdsMsg[100] = bufferRdsMsg[100] = '\0';
-//  if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
-//  cleanBfoRdsInfo();
-//  strcpy(bufferRdsMsg, rdsMsg);
-//  drawSprite();
-//}
+void showRDSMsg()
+{
+  //rdsMsg[100] = bufferRdsMsg[100] = '\0';
+if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
+cleanBfoRdsInfo();
+strcpy(bufferRdsMsg, rdsMsg);
+drawSprite();
+}
 
 
 
