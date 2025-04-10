@@ -156,9 +156,9 @@
 
 // Settings Options
 #define MENU_BRIGHTNESS   0
-#define MENU_SLEEP        1
+#define MENU_SLEEP        3
 #define MENU_THEME        2
-#define MENU_ECOMODE      3
+#define MENU_ECOMODE      1
 #define MENU_ABOUT        4
 
 #define EEPROM_SIZE     512
