@@ -10,9 +10,8 @@
 #include "patch_init.h"            // SSB patch for whole SSBRX initialization string
 #include "esp_sleep.h"
 #include "poxel_font16pt7b.h"      // Font1 Band display
-#include "alarm_clock9pt7b.h"      // Font2 RDS Station
-#include "PixelOperator8pt7b.h"    // Font3 RDS Message
-#include "PixelOperator7pt7b.h"    // Font4 S-metre
+#include "Technology10pt7b.h"      // Font2 RDS Station
+#include "PixelOperator8pt7b.h"    // Font3 RDS Message and S-meter
 
 
 // PIN DEFINITIONS
@@ -2235,7 +2234,7 @@ void drawSprite()
     spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
     const char* labelText = "1•3•5•7•9•+10•+20•+30";
 
-    spr.setFreeFont(&PixelOperator7pt7b);
+    spr.setFreeFont(&PixelOperator8pt7b);
     spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
     int labelWidth = spr.textWidth(labelText);
     int labelX = barX + (barWidth - labelWidth) / 2;
@@ -2245,7 +2244,7 @@ void drawSprite()
     
     
 
-    //S-Meter
+//    //S-Meter
 //    spr.drawTriangle(meter_offset_x + 1, meter_offset_y + 1, meter_offset_x + 11, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 6, theme[themeIdx].smeter_icon);
 //    spr.drawLine(meter_offset_x + 6, meter_offset_y + 1, meter_offset_x + 6, meter_offset_y + 14, theme[themeIdx].smeter_icon);    for(int i=0; i<getStrength(); i++) {
 //      if (i<10) {
@@ -2267,52 +2266,52 @@ void drawSprite()
       //}
         spr.setTextDatum(MR_DATUM);
         //spr.fillRect(rds_offset_x, rds_offset_y - 2, 150, 20, theme[themeIdx].bg);
-        spr.setFreeFont(&alarm_clock9pt7b);
+        spr.setFreeFont(&Technology10pt7b);
         spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
         //spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
         spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
-      //}
-
-    //if (currentMode == FM) {
-      spr.setTextDatum(TL_DATUM);
-      spr.setFreeFont(&PixelOperator8pt7b);
-      spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
-      const int max_line_len = 30;
-      char line1[max_line_len + 1];
-      char line2[max_line_len + 1];
-      int len = strlen(bufferRdsMsg);
-      if (len <= max_line_len) {
-        strncpy(line1, bufferRdsMsg, max_line_len);
-        line1[len] = '\0';
-        line2[0] = '\0';
-      } 
-      else {
-        int breakIndex = max_line_len;
-        while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
-          breakIndex--;
-        }
-        if (breakIndex == 0) {
-          breakIndex = max_line_len;
-        }
-  
-        strncpy(line1, bufferRdsMsg, breakIndex);
-        line1[breakIndex] = '\0';
-    
-        int startSecondLine = breakIndex;
-        while (bufferRdsMsg[startSecondLine] == ' ' && startSecondLine < len) {
-          startSecondLine++;
-        }
-    
-        strncpy(line2, bufferRdsMsg + startSecondLine, max_line_len);
-        line2[max_line_len] = '\0';
-      }
-  
-      spr.drawString(line1, rdsmess_offset_x, rdsmess_offset_y);
-      if (strlen(line2) > 0) {
-        int lineSpacing = 13;
-        spr.drawString(line2, rdsmess_offset_x, rdsmess_offset_y + lineSpacing);
-      }
     }
+
+//    //if (currentMode == FM) {
+//      spr.setTextDatum(TL_DATUM);
+//      spr.setFreeFont(&PixelOperator8pt7b);
+//      spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
+//      const int max_line_len = 30;
+//      char line1[max_line_len + 1];
+//      char line2[max_line_len + 1];
+//      int len = strlen(bufferRdsMsg);
+//      if (len <= max_line_len) {
+//        strncpy(line1, bufferRdsMsg, max_line_len);
+//        line1[len] = '\0';
+//        line2[0] = '\0';
+//      } 
+//      else {
+//       int breakIndex = max_line_len;
+//        while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
+//          breakIndex--;
+//        }
+//        if (breakIndex == 0) {
+//          breakIndex = max_line_len;
+//        }
+//  
+//        strncpy(line1, bufferRdsMsg, breakIndex);
+//        line1[breakIndex] = '\0';
+//    
+//        int startSecondLine = breakIndex;
+//        while (bufferRdsMsg[startSecondLine] == ' ' && startSecondLine < len) {
+//          startSecondLine++;
+//        }
+//    
+//        strncpy(line2, bufferRdsMsg + startSecondLine, max_line_len);
+//        line2[max_line_len] = '\0';
+//      }
+//  
+//      spr.drawString(line1, rdsmess_offset_x, rdsmess_offset_y);
+//      if (strlen(line2) > 0) {
+//        int lineSpacing = 13;
+//        spr.drawString(line2, rdsmess_offset_x, rdsmess_offset_y + lineSpacing);
+//      }
+//    }
     
 
     if (isCB()) {
@@ -2415,13 +2414,14 @@ uint16_t applyAlpha(uint16_t color, uint16_t bgColor, uint8_t alpha) {
   return (rNew << 11) | (gNew << 5) | (bNew);
 }
 
-// --- Fonction de fondu pour le texte RDS ---
-// Cette fonction réalise une transition douce entre l'ancien et le nouveau message.
+
+// --- Exemple d'intégration dans la mise à jour du RDS ---
+// Supposons que vous ayez un buffer global pour// --- Fonction de fondu pour le texte RDS ---
 void fadeRDSMsg(const char* oldMsg, const char* newMsg) {
-  // Définissez ici les coordonnées et dimensions de la zone affichant le texte RDS
-  const int rdsX = 315;
-  const int rdsY = 72;
-  const int rdsW = 150;  // Largeur approximative de la zone
+  // Utilisation des coordonnées définies par vos constantes
+  const int rdsX = rdsmess_offset_x;  // 100
+  const int rdsY = rdsmess_offset_y;  // 92
+  const int rdsW = 200;  // Largeur approximative de la zone, à ajuster si nécessaire
   const int rdsH = 20;   // Hauteur de la zone
 
   // Récupération des couleurs selon le thème actuel
@@ -2437,7 +2437,7 @@ void fadeRDSMsg(const char* oldMsg, const char* newMsg) {
     spr.fillRect(rdsX, rdsY, rdsW, rdsH, bgColor);
     spr.setTextColor(applyAlpha(textColor, bgColor, alpha), bgColor);
     spr.drawString(oldMsg, rdsX, rdsY);
-    spr.pushSprite(0, 0);      // Actualise la zone d’affichage
+    spr.pushSprite(0, 0); // Actualise la zone d’affichage
     delay(delayFade);
   }
 
@@ -2451,8 +2451,7 @@ void fadeRDSMsg(const char* oldMsg, const char* newMsg) {
   }
 }
 
-// --- Exemple d'intégration dans la mise à jour du RDS ---
-// Supposons que vous ayez un buffer global pour le texte RDS déjà affiché :
+le texte RDS déjà affiché :
 //char bufferRdsMsg[100] = "";
 
 void showRDSMsg() {
