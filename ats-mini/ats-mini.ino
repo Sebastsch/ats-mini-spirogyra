@@ -2384,7 +2384,7 @@ drawSprite();
 }
 
 //void showRDSMsg() {
-/)  // Si le message n'a pas changé, inutile de rafraîchir
+//  // Si le message n'a pas changé, inutile de rafraîchir
 //  if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
   
 //  // Application de la transition douce entre l'ancien et le nouveau message
