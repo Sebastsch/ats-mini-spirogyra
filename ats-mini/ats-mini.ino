@@ -2223,27 +2223,62 @@ void drawSprite()
       spr.drawString(bfo,80,158,4);
     }
 
-    // --- New Version of the S-Meter ---
-    int barWidth  = 100;  // maximum width
-    int barHeight = 4;    // bar height
-    
-    int barX = meter_offset_x;
-    int barY = meter_offset_y;
+// Définition de la zone du S-Mètre
+int barWidth  = 100;  // largeur totale de la barre (à ajuster selon votre design)
+int barHeight = 4;    // hauteur de la barre
 
-    int strength = getStrength();
-    int fillWidth = ((strength - 1) * barWidth) / 16;
-    
-    spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
-    const char* labelText = "1•3•5•7•9•+10•+20•+30";
+int barX = meter_offset_x;
+int barY = meter_offset_y;
 
-    spr.setFreeFont(&PixelOperator8pt7b);
-    spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
-    int labelWidth = spr.textWidth(labelText);
-    int labelX = barX + (barWidth - labelWidth) / 2;
-    int labelY = barY + barHeight + 4;
-    spr.drawString(labelText, labelX, labelY, 1);
+// Récupération du niveau de signal
+int strength = getStrength();
+int fillWidth = 0;
 
-    
+// Mapping simple par niveau (les valeurs numériques sont à ajuster selon vos repères affichés)
+// Par exemple, supposons que getStrength() renvoie des valeurs discrètes telles que : 
+// 2 pour S1, 4 pour S3, 6 pour S5, 8 pour S7, 10 pour S9, 12 pour +10, 14 pour +20, 16 pour +30, etc.
+if (strength <= 2) {
+    // Niveau S1 
+    fillWidth = 10; // la barre s'arrête au-dessus du "1"
+} else if (strength <= 4) {
+    // Niveau S3 
+    fillWidth = 30; // la barre s'arrête au-dessus du "3"
+} else if (strength <= 6) {
+    // Niveau S5 : la barre va jusqu'au-dessus du "5"
+    fillWidth = 50;
+} else if (strength <= 8) {
+    // Niveau S7 
+    fillWidth = 70;
+} else if (strength <= 10) {
+    // Niveau S9 
+    fillWidth = 90;
+} else if (strength == 12) {
+    // Niveau +10
+    fillWidth = 105;
+} else if (strength == 14) {
+    // Niveau +20
+    fillWidth = 120;
+} else if (strength == 16) {
+    // Niveau +30
+    fillWidth = 135;
+} else {
+    // Par exemple, pour un RSSI équivalent à +40 (ou supérieur) :
+    // Vous indiquez ici que, pour +40, la barre doit s'arrêter à la position du chiffre "4" dans le label "+40"
+    // Ajustez cette valeur pour qu'elle corresponde exactement à l'alignement souhaité
+    fillWidth = 150;
+}
+
+// Dessin de la barre
+spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
+
+// Affichage des repères
+const char* labelText = "1•3•5•7•9•+10•+20•+30";
+spr.setFreeFont(&PixelOperator8pt7b);
+spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
+int labelWidth = spr.textWidth(labelText);
+int labelX = barX + (barWidth - labelWidth) / 2;
+int labelY = barY + barHeight + 4;
+spr.drawString(labelText, labelX, labelY, 1);  
     
 
     //S-Meter
