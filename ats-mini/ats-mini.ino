@@ -2271,47 +2271,46 @@ void drawSprite()
         //spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
         spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
     }
-
-//    //if (currentMode == FM) {
-//      spr.setTextDatum(TL_DATUM);
-//      spr.setFreeFont(&PixelOperator8pt7b);
-//      spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
-//      const int max_line_len = 30;
-//      char line1[max_line_len + 1];
-//      char line2[max_line_len + 1];
-//      int len = strlen(bufferRdsMsg);
-//      if (len <= max_line_len) {
-//        strncpy(line1, bufferRdsMsg, max_line_len);
-//        line1[len] = '\0';
-//        line2[0] = '\0';
-//      } 
-//      else {
-//       int breakIndex = max_line_len;
-//        while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
-//          breakIndex--;
-//        }
-//        if (breakIndex == 0) {
-//          breakIndex = max_line_len;
-//        }
-//  
-//        strncpy(line1, bufferRdsMsg, breakIndex);
-//        line1[breakIndex] = '\0';
-//    
-//        int startSecondLine = breakIndex;
-//        while (bufferRdsMsg[startSecondLine] == ' ' && startSecondLine < len) {
-//          startSecondLine++;
-//        }
-//    
-//        strncpy(line2, bufferRdsMsg + startSecondLine, max_line_len);
-//        line2[max_line_len] = '\0';
-//      }
-//  
-//      spr.drawString(line1, rdsmess_offset_x, rdsmess_offset_y);
-//      if (strlen(line2) > 0) {
-//        int lineSpacing = 13;
-//        spr.drawString(line2, rdsmess_offset_x, rdsmess_offset_y + lineSpacing);
-//      }
-//    }
+//if (currentMode == FM) {
+      spr.setTextDatum(TL_DATUM);
+      spr.setFreeFont(&PixelOperator8pt7b);
+      spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
+      const int max_line_len = 30;
+      char line1[max_line_len + 1];
+      char line2[max_line_len + 1];
+      int len = strlen(bufferRdsMsg);
+      if (len <= max_line_len) {
+        strncpy(line1, bufferRdsMsg, max_line_len);
+        line1[len] = '\0';
+        line2[0] = '\0';
+      } 
+      else {
+       int breakIndex = max_line_len;
+        while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
+          breakIndex--;
+        }
+        if (breakIndex == 0) {
+          breakIndex = max_line_len;
+        }
+  
+        strncpy(line1, bufferRdsMsg, breakIndex);
+        line1[breakIndex] = '\0';
+    
+        int startSecondLine = breakIndex;
+        while (bufferRdsMsg[startSecondLine] == ' ' && startSecondLine < len) {
+          startSecondLine++;
+        }
+    
+        strncpy(line2, bufferRdsMsg + startSecondLine, max_line_len);
+        line2[max_line_len] = '\0';
+      }
+  
+      spr.drawString(line1, rdsmess_offset_x, rdsmess_offset_y);
+      if (strlen(line2) > 0) {
+        int lineSpacing = 13;
+        spr.drawString(line2, rdsmess_offset_x, rdsmess_offset_y + lineSpacing);
+      }
+    }
     
 
     if (isCB()) {
@@ -2381,77 +2380,15 @@ void showRDSStation() {
 drawSprite();
 }
 
-//void showRDSMsg() {
-//  // Si le message n'a pas changé, inutile de rafraîchir
-//  if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
-  
-//  // Application de la transition douce entre l'ancien et le nouveau message
-//  fadeRDSMsg(bufferRdsMsg, rdsMsg);
-  
-//  // Mettez à jour le buffer avec le nouveau message
-//  strcpy(bufferRdsMsg, rdsMsg);
-//}
-
-
-// --- Fonction utilitaire pour simuler une "opacité" sur une couleur RVB565  ---
-uint16_t applyAlpha(uint16_t color, uint16_t bgColor, uint8_t alpha) {
-  // alpha varie de 0 (transparent, donc bgColor) à 255 (opaque, donc color)
-  // Extraire les composantes R, G, B en RVB565
-  uint8_t r = (color >> 11) & 0x1F;
-  uint8_t g = (color >> 5) & 0x3F;
-  uint8_t b = color & 0x1F;
-  
-  uint8_t bgR = (bgColor >> 11) & 0x1F;
-  uint8_t bgG = (bgColor >> 5) & 0x3F;
-  uint8_t bgB = bgColor & 0x1F;
-  
-  // Calculer le mix en fonction de alpha (convertir alpha sur 255 en fraction)
-  float a = alpha / 255.0;
-  uint8_t rNew = bgR + a * (r - bgR);
-  uint8_t gNew = bgG + a * (g - bgG);
-  uint8_t bNew = bgB + a * (b - bgB);
-  
-  return (rNew << 11) | (gNew << 5) | (bNew);
+void showRDSMsg()
+{
+  //rdsMsg[100] = bufferRdsMsg[100] = '\0';
+  if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
+  cleanBfoRdsInfo();
+  strcpy(bufferRdsMsg, rdsMsg);
+  drawSprite();
 }
 
-
-// --- Exemple d'intégration dans la mise à jour du RDS ---
-// Supposons que vous ayez un buffer global pour// --- Fonction de fondu pour le texte RDS ---
-void fadeRDSMsg(const char* oldMsg, const char* newMsg) {
-  // Utilisation des coordonnées définies par vos constantes
-  const int rdsX = rdsmess_offset_x;  // 100
-  const int rdsY = rdsmess_offset_y;  // 92
-  const int rdsW = 200;  // Largeur approximative de la zone, à ajuster si nécessaire
-  const int rdsH = 20;   // Hauteur de la zone
-
-  // Récupération des couleurs selon le thème actuel
-  uint16_t textColor = theme[themeIdx].rds_text;
-  uint16_t bgColor = theme[themeIdx].bg;
-  
-  // Paramètres de la transition
-  const int fadeStep = 15;     // Pas de réduction de l'opacité
-  const int delayFade = 30;    // Délai en millisecondes entre chaque étape
-
-  // Phase 1 : fondu sortant de l'ancien texte
-  for (int alpha = 255; alpha >= 0; alpha -= fadeStep) {
-    spr.fillRect(rdsX, rdsY, rdsW, rdsH, bgColor);
-    spr.setTextColor(applyAlpha(textColor, bgColor, alpha), bgColor);
-    spr.drawString(oldMsg, rdsX, rdsY);
-    spr.pushSprite(0, 0); // Actualise la zone d’affichage
-    delay(delayFade);
-  }
-
-  // Phase 2 : fondu entrant du nouveau texte
-  for (int alpha = 0; alpha <= 255; alpha += fadeStep) {
-    spr.fillRect(rdsX, rdsY, rdsW, rdsH, bgColor);
-    spr.setTextColor(applyAlpha(textColor, bgColor, alpha), bgColor);
-    spr.drawString(newMsg, rdsX, rdsY);
-    spr.pushSprite(0, 0);
-    delay(delayFade);
-  }
-}
-
-//char bufferRdsMsg[100] = "";
 
 void showRDSMsg() {
   // Si le message n'a pas changé, inutile de rafraîchir
