@@ -11,7 +11,6 @@
 #include "esp_sleep.h"
 #include "poxel_font16pt7b.h"      // Font1 Band display
 #include "alarm_clock9pt7b.h"      // Font2 RDS Station
-#include "PixelOperator8p.h"       // Font3 RDS Message
 #include "PixelOperator8pt7b.h"     // Font4 s-metre
 
 
