@@ -2451,7 +2451,6 @@ void fadeRDSMsg(const char* oldMsg, const char* newMsg) {
   }
 }
 
-le texte RDS déjà affiché :
 //char bufferRdsMsg[100] = "";
 
 void showRDSMsg() {
