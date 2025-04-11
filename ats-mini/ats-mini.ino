@@ -2880,7 +2880,6 @@ void showAvc()
 drawSprite();
 }
 
-
 void buttonCheck() {
   // G8PTN: Added
   // Push button detection
