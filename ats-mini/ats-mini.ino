@@ -2893,10 +2893,12 @@ void buttonCheck() {
     }
 
     if ((millis() - pb1_edge_time) > CLICK_
-        pb1_released = false;
-        pb1_short_released =          #if DEBUG2_PRINT
-          Serial.println("Info: button_check() >>> Short Press triggered");
-          #endif
+      pb1_released = false;
+      pb1_short_released =          
+      #if
+      DEBUG2_PRINT
+      Serial.println("Info: button_check() >>> Short Press triggered");
+    #endif
         }
         if (pb1_press_duration > LONG_PRESS_TIME && (pb1_long_pressed_time - pb1_pressed_time) != LONG_PRESS_TIME) {
           pb1_TIME) {         // Debounced
