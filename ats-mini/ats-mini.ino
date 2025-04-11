@@ -65,8 +65,8 @@
 #define menu_offset_x    0    // Menu horizontal offset
 #define menu_offset_y   20    // Menu vertical offset
 #define menu_delta_x    10    // Menu width delta
-#define meter_offset_x   2    // Meter horizontal offset
-#define meter_offset_y   2    // Meter vertical offset
+#define meter_offset_x   0    // Meter horizontal offset
+#define meter_offset_y   0    // Meter vertical offset
 #define save_offset_x  300    // EEPROM save icon horizontal offset
 #define save_offset_y  116    // EEPROM save icon vertical offset
 #define freq_offset_x  250    // Frequency horizontal offset
@@ -2239,13 +2239,13 @@ int fillWidth = 0;
 // 2 pour S1, 4 pour S3, 6 pour S5, 8 pour S7, 10 pour S9, 12 pour +10, 14 pour +20, 16 pour +30, etc.
 if (strength <= 2) {
     // Niveau S1 
-    fillWidth = 5; // la barre s'arrête au-dessus du "1"
+    fillWidth = 7; // la barre s'arrête au-dessus du "1"
 } else if (strength <= 4) {
     // Niveau S3 
-    fillWidth = 11; // la barre s'arrête au-dessus du "3"
+    fillWidth = 12; // la barre s'arrête au-dessus du "3"
 } else if (strength <= 6) {
     // Niveau S5 : la barre va jusqu'au-dessus du "5"
-    fillWidth = 18;
+    fillWidth = 20;
 } else if (strength <= 8) {
     // Niveau S7 
     fillWidth = 26;
@@ -2254,10 +2254,10 @@ if (strength <= 2) {
     fillWidth = 34;
 } else if (strength == 12) {
     // Niveau +10
-    fillWidth = 48;
+    fillWidth = 55;
 } else if (strength == 14) {
     // Niveau +20
-    fillWidth = 70;
+    fillWidth = 74;
 } else if (strength == 16) {
     // Niveau +30
     fillWidth = 93;
@@ -2265,7 +2265,7 @@ if (strength <= 2) {
     // Par exemple, pour un RSSI équivalent à +40 (ou supérieur) :
     // Vous indiquez ici que, pour +40, la barre doit s'arrêter à la position du chiffre "4" dans le label "+40"
     // Ajustez cette valeur pour qu'elle corresponde exactement à l'alignement souhaité
-    fillWidth = 116;
+    fillWidth = 112;
 }
 
 // Dessin de la barre
