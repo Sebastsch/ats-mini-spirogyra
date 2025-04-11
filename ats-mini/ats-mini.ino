@@ -2880,6 +2880,7 @@ void showAvc()
 drawSprite();
 }
 
+
 void buttonCheck() {
   // G8PTN: Added
   // Push button detection
@@ -2892,16 +2893,7 @@ void buttonCheck() {
       pb1_last = pb1_current;
     }
 
-    if ((millis() - pb1_edge_time) > CLICK_
-      pb1_released = false;
-      pb1_short_released =          
-      #if
-      DEBUG2_PRINT
-      Serial.println("Info: button_check() >>> Short Press triggered");
-    #endif
-        }
-        if (pb1_press_duration > LONG_PRESS_TIME && (pb1_long_pressed_time - pb1_pressed_time) != LONG_PRESS_TIME) {
-          pb1_TIME) {         // Debounced
+    if ((millis() - pb1_edge_time) > CLICK_TIME) {         // Debounced
       if (pb1_stable == HIGH && pb1_last == LOW) {         // button is pressed
         // Debug
         #if DEBUG2_PRINT
@@ -2912,7 +2904,21 @@ void buttonCheck() {
         pb1_stable = pb1_last;
         pb1_pressed = true;                                // Set flags
         pb1_short_pressed = false;
-        pb1_long_pressed = false;short_pressed = false;
+        pb1_long_pressed = false;
+        pb1_released = false;
+        pb1_short_released = false;
+        pb1_long_released = false;
+      } else if (pb1_stable == LOW && pb1_last == LOW) {   // button is still pressed
+        long pb1_press_duration = millis() - pb1_pressed_time;
+        if (pb1_press_duration > SHORT_PRESS_TIME && (pb1_short_pressed_time - pb1_pressed_time) != SHORT_PRESS_TIME) {
+          pb1_short_pressed = true;
+          pb1_short_pressed_time = pb1_pressed_time + SHORT_PRESS_TIME;
+          #if DEBUG2_PRINT
+          Serial.println("Info: button_check() >>> Short Press triggered");
+          #endif
+        }
+        if (pb1_press_duration > LONG_PRESS_TIME && (pb1_long_pressed_time - pb1_pressed_time) != LONG_PRESS_TIME) {
+          pb1_short_pressed = false;
           pb1_long_pressed = true;
           pb1_long_pressed_time = pb1_pressed_time + LONG_PRESS_TIME;
           #if DEBUG2_PRINT
@@ -2946,6 +2952,8 @@ void buttonCheck() {
     }
   }
 }
+
+
 
 void clock_time()
 {
