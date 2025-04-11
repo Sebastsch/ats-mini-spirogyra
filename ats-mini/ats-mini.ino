@@ -2224,7 +2224,7 @@ void drawSprite()
     }
 
 // Définition de la zone du S-Mètre
-int barWidth  = 100;  // largeur totale de la barre (à ajuster selon votre design)
+int barWidth  = 120;  // largeur totale de la barre (à ajuster selon votre design)
 int barHeight = 4;    // hauteur de la barre
 
 int barX = meter_offset_x;
@@ -2265,7 +2265,7 @@ if (strength <= 2) {
     // Par exemple, pour un RSSI équivalent à +40 (ou supérieur) :
     // Vous indiquez ici que, pour +40, la barre doit s'arrêter à la position du chiffre "4" dans le label "+40"
     // Ajustez cette valeur pour qu'elle corresponde exactement à l'alignement souhaité
-    fillWidth = 150;
+    fillWidth = 116;
 }
 
 // Dessin de la barre
@@ -2455,7 +2455,7 @@ void checkRDS()
   {
     if (rx.getRdsSync() && rx.getRdsSyncFound())
     {
-      rdsMsg = rx.getRdsText2A();
+      rdsMsg = rx.getRdsText2B();
       stationName = rx.getRdsText0A();
       rdsTime = rx.getRdsTime();
       
