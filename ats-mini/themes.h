@@ -447,7 +447,7 @@ const ColorTheme theme[] = {
     0x4D15, // Mono_icon
     0xDEFA, // band_text
     0x4D15, // mode_text
-    0x4083, // mode_border
+    0xFFFF, // mode_border
     0x2A2C, // box_bg
     0x2A2C, // box_border
     0xDEFA, // box_text
