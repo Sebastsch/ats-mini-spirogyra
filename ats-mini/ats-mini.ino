@@ -682,7 +682,8 @@ void setup()
   // TFT display brightness control (PWM)
   // Note: At brightness levels below 100%, switching from the PWM may cause power spikes and/or RFI
   ledcAttach(PIN_LCD_BL, 16000, 8);  // Pin assignment, 16kHz, 8-bit
-  ledcWrite(PIN_LCD_BL, 255);        // Default value 255 = 100%)
+  //ledcWrite(PIN_LCD_BL, 255);        // Default value 255 = 100%)
+  displayOff();
 
   // EEPROM
   // Note: Use EEPROM.begin(EEPROM_SIZE) before use and EEPROM.begin.end after use to free up memory and avoid memory leaks
@@ -812,6 +813,9 @@ void setup()
   // ICACHE_RAM_ATTR void rotaryEncoder(); see rotaryEncoder implementation below.
   attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_A), rotaryEncoder, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_B), rotaryEncoder, CHANGE);
+
+  delay(1000);
+  displayOn();
 }
 
 
