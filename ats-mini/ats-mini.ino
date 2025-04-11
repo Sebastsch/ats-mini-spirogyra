@@ -1881,10 +1881,10 @@ uint8_t getStrength() {
         if (rssi > 24 && rssi <= 34) return 11;    // S9 +10
         if (rssi > 34 && rssi <= 44) return 12;    // S9 +20
         if (rssi > 44 && rssi <= 54) return 13;    // S9 +30
-        if (rssi > 54 && rssi <= 64) return 14;    // S9 +40
-        if (rssi > 64 && rssi <= 74) return 15;    // S9 +50
-        if (rssi > 76)               return 17;    // >S9 +60
-        if (rssi > 74)               return 16;    // S9 +60
+        //if (rssi > 54 && rssi <= 64) return 14;    // S9 +40
+        //if (rssi > 64 && rssi <= 74) return 15;    // S9 +50
+        //if (rssi > 76)               return 17;    // >S9 +60
+        if (rssi > 74)               return 14;    // S9 +60
     }
     return 1;
 }
