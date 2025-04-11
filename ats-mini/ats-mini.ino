@@ -79,8 +79,8 @@
 // #define mode_offset_y  114    // Mode vertical offset
 #define vol_offset_x   120    // Volume horizontal offset
 #define vol_offset_y   150    // Volume vertical offset
-#define rds_offset_x   315    // RDS horizontal offset
-#define rds_offset_y    72    // RDS vertical offset
+#define rds_offset_x   315    // RDS station horizontal offset
+#define rds_offset_y    72    // RDS station vertical offset
 
 #define rdsmess_offset_x   100    // RDS message horizontal offset
 #define rdsmess_offset_y    92    // RDS message vertical offset
@@ -2224,7 +2224,7 @@ void drawSprite()
     }
 
 // Définition de la zone du S-Mètre
-int barWidth  = 120;  // largeur totale de la barre (à ajuster selon votre design)
+int barWidth  = 100;  // largeur totale de la barre (à ajuster selon votre design)
 int barHeight = 4;    // hauteur de la barre
 
 int barX = meter_offset_x;
@@ -2455,7 +2455,7 @@ void checkRDS()
   {
     if (rx.getRdsSync() && rx.getRdsSyncFound())
     {
-      rdsMsg = rx.getRdsText2B();
+      rdsMsg = rx.getRdsText2A();
       stationName = rx.getRdsText0A();
       rdsTime = rx.getRdsTime();
       
@@ -2893,7 +2893,14 @@ void buttonCheck() {
       pb1_last = pb1_current;
     }
 
-    if ((millis() - pb1_edge_time) > CLICK_TIME) {         // Debounced
+    if ((millis() - pb1_edge_time) > CLICK_
+        pb1_released = false;
+        pb1_short_released =          #if DEBUG2_PRINT
+          Serial.println("Info: button_check() >>> Short Press triggered");
+          #endif
+        }
+        if (pb1_press_duration > LONG_PRESS_TIME && (pb1_long_pressed_time - pb1_pressed_time) != LONG_PRESS_TIME) {
+          pb1_TIME) {         // Debounced
       if (pb1_stable == HIGH && pb1_last == LOW) {         // button is pressed
         // Debug
         #if DEBUG2_PRINT
@@ -2904,21 +2911,7 @@ void buttonCheck() {
         pb1_stable = pb1_last;
         pb1_pressed = true;                                // Set flags
         pb1_short_pressed = false;
-        pb1_long_pressed = false;
-        pb1_released = false;
-        pb1_short_released = false;
-        pb1_long_released = false;
-      } else if (pb1_stable == LOW && pb1_last == LOW) {   // button is still pressed
-        long pb1_press_duration = millis() - pb1_pressed_time;
-        if (pb1_press_duration > SHORT_PRESS_TIME && (pb1_short_pressed_time - pb1_pressed_time) != SHORT_PRESS_TIME) {
-          pb1_short_pressed = true;
-          pb1_short_pressed_time = pb1_pressed_time + SHORT_PRESS_TIME;
-          #if DEBUG2_PRINT
-          Serial.println("Info: button_check() >>> Short Press triggered");
-          #endif
-        }
-        if (pb1_press_duration > LONG_PRESS_TIME && (pb1_long_pressed_time - pb1_pressed_time) != LONG_PRESS_TIME) {
-          pb1_short_pressed = false;
+        pb1_long_pressed = false;short_pressed = false;
           pb1_long_pressed = true;
           pb1_long_pressed_time = pb1_pressed_time + LONG_PRESS_TIME;
           #if DEBUG2_PRINT
