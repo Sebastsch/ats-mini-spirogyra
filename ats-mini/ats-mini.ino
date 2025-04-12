@@ -2228,46 +2228,61 @@ void drawSprite()
       spr.drawString(bfo,80,158,4);
     }
 
+
+void drawSignalLevel() {
+    spr.setTextDatum(MC_DATUM); // Position au centre
+    spr.setTextColor(theme[themeIdx].smeter_text, theme[themeIdx].bg); // Couleur du texte
+    spr.drawString(getSignalLevelText(), 160, 80, 4); // Texte avec niveau de signal
+}
+
+String getSignalLevelText() {
+    // Conversion RSSI à niveau S
+    uint8_t strength = getStrength();
+    if (strength <= 9) return "S" + String(strength); 
+    else return "S9+" + String((strength - 9) * 10); // S9+XX
+}
+
+    
     
     // S-Metre
-    int barWidth  = 100;
-    int barHeight = 4;
+    //int barWidth  = 100;
+    //int barHeight = 4;
     
-    int barX = meter_offset_x;
-    int barY = meter_offset_y;
+    //int barX = meter_offset_x;
+    //int barY = meter_offset_y;
     
-    int strength = getStrength();
-    int fillWidth = 0;
+    //int strength = getStrength();
+    //int fillWidth = 0;
     
-    if (strength <= 2) {
-      fillWidth = 5;
-    } else if (strength <= 4) {
-      fillWidth = 11;
+    //if (strength <= 2) {
+      //fillWidth = 5;
+    //} else if (strength <= 4) {
+      //fillWidth = 11;
     } else if (strength <= 6) {
       fillWidth = 18;
-    } else if (strength <= 8) {
-      fillWidth = 25;
-    } else if (strength <= 10) {
-      fillWidth = 32;
-    } else if (strength == 12) {
-      fillWidth = 43;
-    } else if (strength == 14) {
-      fillWidth = 63;
-    } else if (strength == 16) {
-      fillWidth = 82;
-    } else {
+    //} else if (strength <= 8) {
+      /)fillWidth = 25;
+    //} else if (strength <= 10) {
+      //fillWidth = 32;
+    //} else if (strength == 12) {
+      //fillWidth = 43;
+    //} else if (strength == 14) {
+      //fillWidth = 63;
+    //} else if (strength == 16) {
+      //fillWidth = 82;
+    //} else {
       fillWidth = 100;
-    }
+    //}
     
-    spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
+    //spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
     
-    const char* labelText = "1•3•5•7•9• |10•|20•|30";
-    spr.setFreeFont(&PixelOperator8pt7b);
-    spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
-    int labelWidth = spr.textWidth(labelText);
-    int labelX = barX + (barWidth - labelWidth) / 2;
-    int labelY = barY + barHeight + 4;
-    spr.drawString(labelText, labelX, labelY, 1);  
+    //const char* labelText = "1•3•5•7•9• |10•|20•|30";
+    //spr.setFreeFont(&PixelOperator8pt7b);
+    //spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
+    //int labelWidth = spr.textWidth(labelText);
+    //int labelX = barX + (barWidth - labelWidth) / 2;
+    //int labelY = barY + barHeight + 4;
+    //spr.drawString(labelText, labelX, labelY, 1);  
     
 
     //S-Meter
@@ -2991,15 +3006,34 @@ void displayOn() {
 
 
 
-void espDeepSleep() {
-  displayOff();  // Turn off the display before entering deep sleep mode.
-  Serial.println("Entering deep sleep mode");  
-  esp_deep_sleep_start();
+
+
+
+
+void drawSignalLevel() {
+    spr.setTextDatum(TL_DATUM); // Aligner en haut à gauche (TL_DATUM correspond au coin supérieur gauche)
+    spr.setTextColor(theme[themeIdx].smeter_text, theme[themeIdx].bg); // Couleurs adaptées au thème
+    spr.drawString(getSignalLevelText(), meter_offset_x + 10, meter_offset_y + 10, 2); // Texte niveau signal
+}
+
+String getSignalLevelText() {
+    uint8_t strength = getStrength(); // Conversion du RSSI en niveau S
+    if (strength <= 9) return "Signal: S" + String(strength);
+    else return "Signal: S9+" + String((strength - 9) * 10); // S9+XX
 }
 
 
 
 
+
+
+
+
+void espDeepSleep() {
+  displayOff();  // Turn off the display before entering deep sleep mode.
+  Serial.println("Entering deep sleep mode");  
+  esp_deep_sleep_start();
+}
 
 void captureScreen() {
   uint16_t width = spr.width(), height = spr.height();
