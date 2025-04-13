@@ -11,7 +11,7 @@
 #include "esp_sleep.h"
 #include "poxel_font16pt7b.h"      // Font1 Band display
 #include "Technology10pt7b.h"      // Font2 RDS Station
-#include "PixelOperator8pt7b.h"    // Font3 RDS Message
+#include "PixelOperator8p.h"       // Font3 RDS Message
 
 
 // =================================
@@ -65,8 +65,8 @@
 #define menu_offset_x    0    // Menu horizontal offset
 #define menu_offset_y   20    // Menu vertical offset
 #define menu_delta_x    10    // Menu width delta
-#define meter_offset_x   0    // Meter horizontal offset
-#define meter_offset_y   0    // Meter vertical offset
+#define meter_offset_x   2    // Meter horizontal offset
+#define meter_offset_y   2    // Meter vertical offset
 #define save_offset_x  300    // EEPROM save icon horizontal offset
 #define save_offset_y  116    // EEPROM save icon vertical offset
 #define freq_offset_x  250    // Frequency horizontal offset
@@ -79,8 +79,8 @@
 // #define mode_offset_y  114    // Mode vertical offset
 #define vol_offset_x   120    // Volume horizontal offset
 #define vol_offset_y   150    // Volume vertical offset
-#define rds_offset_x   315    // RDS station horizontal offset
-#define rds_offset_y    72    // RDS station vertical offset
+#define rds_offset_x   315    // RDS horizontal offset
+#define rds_offset_y    72    // RDS vertical offset
 
 #define rdsmess_offset_x   100    // RDS message horizontal offset
 #define rdsmess_offset_y    92    // RDS message vertical offset
@@ -682,8 +682,7 @@ void setup()
   // TFT display brightness control (PWM)
   // Note: At brightness levels below 100%, switching from the PWM may cause power spikes and/or RFI
   ledcAttach(PIN_LCD_BL, 16000, 8);  // Pin assignment, 16kHz, 8-bit
-  //ledcWrite(PIN_LCD_BL, 255);        // Default value 255 = 100%)
-  displayOff();
+  ledcWrite(PIN_LCD_BL, 255);        // Default value 255 = 100%)
 
   // EEPROM
   // Note: Use EEPROM.begin(EEPROM_SIZE) before use and EEPROM.begin.end after use to free up memory and avoid memory leaks
@@ -737,10 +736,7 @@ void setup()
   // Attached pin to allows SI4732 library to mute audio as required to minimise loud clicks
   rx.setAudioMuteMcuPin(AUDIO_MUTE);
 
-  //cleanBfoRdsInfo();
-
-  cleanRdsStationInfo();
-  cleanRdsMsgInfo();
+  cleanBfoRdsInfo();
 
   delay(100);
 
@@ -813,9 +809,6 @@ void setup()
   // ICACHE_RAM_ATTR void rotaryEncoder(); see rotaryEncoder implementation below.
   attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_A), rotaryEncoder, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_B), rotaryEncoder, CHANGE);
-
-  delay(1000);
-  displayOn();
 }
 
 
@@ -1344,8 +1337,7 @@ void useBand() {
 
   rssi = 0;
   snr = 0;
-  cleanRdsStationInfo();
-  cleanRdsMsgInfo();
+  cleanBfoRdsInfo();
   showStatus();
 }
 
@@ -1848,46 +1840,45 @@ void doCurrentSettingsMenuCmd() {
 
 uint8_t getStrength() {
 #if THEME_EDITOR
-  return 17;
+    return 17;
 #endif
-  if (currentMode != FM) {
-    //dBuV to S point conversion HF
-    if ((rssi <=  1)) return  1;                  // S0
-    if ((rssi >  1) and (rssi <=  2)) return  2;  // S1         // G8PTN: Corrected table
-    if ((rssi >  2) and (rssi <=  3)) return  3;  // S2
-    if ((rssi >  3) and (rssi <=  4)) return  4;  // S3
-    if ((rssi >  4) and (rssi <= 10)) return  5;  // S4
-    if ((rssi > 10) and (rssi <= 16)) return  6;  // S5
-    if ((rssi > 16) and (rssi <= 22)) return  7;  // S6
-    if ((rssi > 22) and (rssi <= 28)) return  8;  // S7
-    if ((rssi > 28) and (rssi <= 34)) return  9;  // S8
-    if ((rssi > 34) and (rssi <= 44)) return 10;  // S9
-    if ((rssi > 44) and (rssi <= 54)) return 11;  // S9 +10
-    if ((rssi > 54) and (rssi <= 64)) return 12;  // S9 +20
-    if ((rssi > 64) and (rssi <= 74)) return 13;  // S9 +30
-    if ((rssi > 74) and (rssi <= 84)) return 14;  // S9 +40
-    if ((rssi > 84) and (rssi <= 94)) return 15;  // S9 +50
-    if  (rssi > 94)                   return 16;  // S9 +60
-    if  (rssi > 95)                   return 17;  //>S9 +60
-  }
-    else
-  {
-    //dBuV to S point conversion FM
-    if  ((rssi <=  1)) return  1;                 // G8PTN: Corrected table
-    if ((rssi >  1) and (rssi <=  2)) return  7;  // S6
-    if ((rssi >  2) and (rssi <=  8)) return  8;  // S7
-    if ((rssi >  8) and (rssi <= 14)) return  9;  // S8
-    if ((rssi > 14) and (rssi <= 24)) return 10;  // S9
-    if ((rssi > 24) and (rssi <= 34)) return 11;  // S9 +10
-    if ((rssi > 34) and (rssi <= 44)) return 12;  // S9 +20
-    if ((rssi > 44) and (rssi <= 54)) return 13;  // S9 +30
-    if ((rssi > 54) and (rssi <= 64)) return 14;  // S9 +40
-    if ((rssi > 64) and (rssi <= 74)) return 15;  // S9 +50
-    if  (rssi > 74)                   return 16;  // S9 +60
-    if  (rssi > 76)                   return 17;  //>S9 +60
-    // newStereoPilot=si4735.getCurrentPilot();
-  }
-  return 1;
+
+    if (currentMode != FM) {
+        // dBuV to S point conversion HF
+        if (rssi <= 1) return 1;                    // S0
+        if (rssi > 1 && rssi <= 2) return 2;        // S1   (G8PTN: table corrigée)
+        if (rssi > 2 && rssi <= 3) return 3;        // S2
+        if (rssi > 3 && rssi <= 4) return 4;        // S3
+        if (rssi > 4 && rssi <= 10) return 5;       // S4
+        if (rssi > 10 && rssi <= 16) return 6;      // S5
+        if (rssi > 16 && rssi <= 22) return 7;      // S6
+        if (rssi > 22 && rssi <= 28) return 8;      // S7
+        if (rssi > 28 && rssi <= 34) return 9;      // S8
+        if (rssi > 34 && rssi <= 44) return 10;     // S9
+        if (rssi > 44 && rssi <= 54) return 11;     // S9 +10
+        if (rssi > 54 && rssi <= 64) return 12;     // S9 +20
+        if (rssi > 64 && rssi <= 74) return 13;     // S9 +30
+        if (rssi > 74 && rssi <= 84) return 14;     // S9 +40
+        if (rssi > 84 && rssi <= 94) return 15;     // S9 +50
+        if (rssi > 95)               return 17;     // >S9 +60
+        if (rssi > 94)               return 16;     // S9 +60
+    }
+    else {
+        // dBuV to S point conversion FM
+        if (rssi <= 1) return 1;                   // S1
+        if (rssi > 1 && rssi <= 2) return 7;       // S6
+        if (rssi > 2 && rssi <= 8) return 8;       // S7
+        if (rssi > 8 && rssi <= 14) return 9;      // S8
+        if (rssi > 14 && rssi <= 24) return 10;    // S9
+        if (rssi > 24 && rssi <= 34) return 11;    // S9 +10
+        if (rssi > 34 && rssi <= 44) return 12;    // S9 +20
+        if (rssi > 44 && rssi <= 54) return 13;    // S9 +30
+        if (rssi > 54 && rssi <= 64) return 14;    // S9 +40
+        if (rssi > 64 && rssi <= 74) return 15;    // S9 +50
+        if (rssi > 76)               return 17;    // >S9 +60
+        if (rssi > 74)               return 16;    // S9 +60
+    }
+    return 1;
 }
 
 
@@ -2167,7 +2158,40 @@ void drawSprite()
       spr.fillSmoothRoundRect(2+menu_offset_x, 2+menu_offset_y, 74+menu_delta_x, 108, 4, theme[themeIdx].box_bg);
       spr.drawString("Step:",6+menu_offset_x,64+menu_offset_y+(-3*16),2);
       if (currentMode == FM) spr.drawString(FmStepDesc[currentStepIdx],48+menu_offset_x,64+menu_offset_y+(-3*16),2);
-      else spr.drawString(AmSsbStepDesc[currentS*
+      else spr.drawString(AmSsbStepDesc[currentStepIdx],48+menu_offset_x,64+menu_offset_y+(-3*16),2);
+      spr.drawString("BW:",6+menu_offset_x,64+menu_offset_y+(-2*16),2);
+      if (isSSB())
+        {
+          spr.drawString(bandwidthSSB[bwIdxSSB].desc,48+menu_offset_x,64+menu_offset_y+(-2*16),2);
+        }
+      else if (currentMode == AM)
+        {
+          spr.drawString(bandwidthAM[bwIdxAM].desc,48+menu_offset_x,64+menu_offset_y+(-2*16),2);
+        }
+      else
+        {
+          spr.drawString(bandwidthFM[bwIdxFM].desc,48+menu_offset_x,64+menu_offset_y+(-2*16),2);
+        }
+      if (agcNdx == 0 && agcIdx == 0) {
+        spr.drawString("AGC:",6+menu_offset_x,64+menu_offset_y+(-1*16),2);
+        spr.drawString("On",48+menu_offset_x,64+menu_offset_y+(-1*16),2);
+      } else {
+        sprintf(sAgc, "%2.2d", agcNdx);
+        spr.drawString("Att:",6+menu_offset_x,64+menu_offset_y+(-1*16),2);
+        spr.drawString(sAgc,48+menu_offset_x,64+menu_offset_y+(-1*16),2);
+      }
+      spr.drawString("AVC:", 6+menu_offset_x, 64+menu_offset_y + (0*16), 2);
+      if (currentMode !=FM) {
+        if (isSSB()) {
+          sprintf(sAvc, "%2.2ddB", SsbAvcIdx);
+        } else {
+          sprintf(sAvc, "%2.2ddB", AmAvcIdx);
+        }
+      } else {
+        sprintf(sAvc, "n/a");
+      }
+      spr.drawString(sAvc, 48+menu_offset_x, 64+menu_offset_y + (0*16), 2);
+      /*
         spr.drawString("BFO:",6+menu_offset_x,64+menu_offset_y+(2*16),2);
         if (isSSB()) {
         spr.setTextDatum(MR_DATUM);
@@ -2194,87 +2218,28 @@ void drawSprite()
       spr.drawString("BFO:",10,158,4);
       spr.drawString(bfo,80,158,4);
     }
-    
-    // S-Metre
-    int barWidth  = 100;
-    int barHeight = 4;
+
+    // --- New Version of the S-Meter ---
+    int barWidth  = 100;  // maximum width
+    int barHeight = 4;    // bar height
     
     int barX = meter_offset_x;
     int barY = meter_offset_y;
-    
-    int strength = getStrength();
-    int fillWidth = 0;
-    
-    if (strength <= 2) {
-      fillWidth = 5;
-    /l/} else if (strength <= 4) {
-      //fillWidth = 11;
-    } e        spr.drawString("BFO:",6+menu_offset_x,64+menu_offset_y+(2*16),2);
-        if (isSSB()) {
-        spr.setTextDatum(MR_DATUM);
-        spr.drawString(bfo,74+menu_offset_x,64+menu_offset_y+(2*16),2);
-        }
-        else spr.drawString("Off",48+menu_offset_x,64+menu_offset_y+(2*16),2);
-        spr.setTextDatum(MC_DATUM);
-      */
 
-      spr.drawString("Vol:",6+menu_offset_x,64+menu_offset_y+(1*16),2);
-      if (muted) {
-        //spr.setTextDatum(MR_DATUM);
-        spr.setTextColor(theme[themeIdx].box_off_text, theme[themeIdx].box_off_bg);
-        spr.drawString("Muted",48+menu_offset_x,64+menu_offset_y+(1*16),2);
-      } else {
-        spr.setTextColor(theme[themeIdx].box_text, theme[themeIdx].box_bg);
-        spr.drawNumber(rx.getVolume(),48+menu_offset_x,64+menu_offset_y+(1*16),2);
-      }
-    }
-
-    if (bfoOn) {
-      spr.setTextDatum(ML_DATUM);
-      spr.setTextColor(theme[themeIdx].text, theme[themeIdx].bg);
-      spr.drawString("BFO:",10,158,4);
-      spr.drawString(bfo,80,158,4);
-    }
-    
-    // S-Metre
-    int barWidth  = 100;
-    int barHeight = 4;
-    
-    int barX = meter_offset_x;
-    int barY = meter_offset_y;
-    
     int strength = getStrength();
-    int fillWidth = 0;
-    
-    if (strength <= 2) {
-      fillWidth = 5;
-    } else if (strength <= 4) {
-      fillWidth = 11;
-    } else if (strength <= 6) {
-      fillWidth = 18;
-    } else if (strength <= 8) {
-      fillWidth = 25;
-    } else if (strength <= 10) {
-      fillWidth = 32;
-    } else if (strength == 12) {
-      fillWidth = 43;
-    } else if (strength == 14) {
-      fillWidth = 63;
-    } else if (strength == 16) {
-      fillWidth = 82;
-    } else {
-      fillWidth = 100;
-    }
+    int fillWidth = ((strength - 1) * barWidth) / 16;
     
     spr.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2, theme[themeIdx].smeter_bar);
-    
-    const char* labelText = "1•3•5•7•9• |10•|20•|30";
+    const char* labelText = "1•3•5•7•9•+10•+20•+30";
+
     spr.setFreeFont(&PixelOperator8pt7b);
     spr.setTextColor(theme[themeIdx].smeter_icon, theme[themeIdx].bg);
     int labelWidth = spr.textWidth(labelText);
     int labelX = barX + (barWidth - labelWidth) / 2;
     int labelY = barY + barHeight + 4;
-    spr.drawString(labelText, labelX, labelY, 1);  
+    spr.drawString(labelText, labelX, labelY, 1);
+
+    
     
 
     //S-Meter
@@ -2306,42 +2271,10 @@ void drawSprite()
         //spr.fillRect(rds_offset_x, rds_offset_y - 2, 150, 20, theme[themeIdx].bg);
         spr.setFreeFont(&Technology10pt7b);
         spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
-);
-        spr.drawString(bfo,74+menu_offset_x,64+menu_offset_y+(2*16),2);
-        }
-        else spr.drawString("Off",48+menu_ofrawString(bfo,80,158,4);
-    /l/} else if (strength <= 4) {
-1
         //spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
         spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
       }
-    // RDS Message
-    if (currentMode == FM) {
-      spr.setTextDatum(TL_DATUM);
-      spr.setFreeFont(&PixelOperator8pt7b);
-      spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
-      const int max_line_len = 30;
-      char line1[max_line_len + 1];
-      char line2[max_line_len + 1];
-      int len = strlen(bufferRdsMsg);
-      if (len <= max_line_len) {
-        strncpy(line1, bufferRdsMsg, max_line_len);
-        line1[len] = '\0';
-        line2[0] = '\0';
-      } 
-      else {
-        int breakIndex = max_line_len;
-        while (breakIndex > 0 && bufferRdsMsg[breakIndex] != ' ') {
-          breakIndex--;
-        }
-        if (breakIndex == 0) {
-          breakIndex = max_line_len;
-        }
-  
-        //spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
-        spr.drawString(bufferStationName, rds_offset_x, rds_offset_y);
-      }
-    // RDS Message
+
     if (currentMode == FM) {
       spr.setTextDatum(TL_DATUM);
       spr.setFreeFont(&PixelOperator8pt7b);
@@ -2438,30 +2371,28 @@ void drawSprite()
 
 }
 
-void cleanRdsStationInfo() {
-  bufferStationName[0] = '\0';
-}
-
-void cleanRdsMsgInfo() {
-  bufferRdsMsg[0] = '\0';
+void cleanBfoRdsInfo()
+{
+  bufferStationName[0]='\0';
 }
 
 void showRDSStation()
 {
-  if (strcmp(bufferStationName, stationName) == 0) return;
-  cleanRdsStationInfo();
+  //stationName[50] = bufferStationName[50] = '\0';
+  if (strcmp(bufferStationName, stationName) == 0 ) return;
+  cleanBfoRdsInfo();
   strcpy(bufferStationName, stationName);
   drawSprite();
 }
 
 void showRDSMsg()
 {
+  //rdsMsg[100] = bufferRdsMsg[100] = '\0';
   if (strcmp(bufferRdsMsg, rdsMsg) == 0) return;
-  cleanRdsMsgInfo();
+  cleanBfoRdsInfo();
   strcpy(bufferRdsMsg, rdsMsg);
   drawSprite();
 }
-
 
 //void showRDSTime()
 //{
@@ -2981,8 +2912,6 @@ void buttonCheck() {
   }
 }
 
-
-
 void clock_time()
 {
   if ((micros() - clock_timer) >= 1000000) {
@@ -3028,11 +2957,17 @@ void displayOn() {
   drawSprite();
 }
 
+
+
 void espDeepSleep() {
   displayOff();  // Turn off the display before entering deep sleep mode.
   Serial.println("Entering deep sleep mode");  
   esp_deep_sleep_start();
 }
+
+
+
+
 
 void captureScreen() {
   uint16_t width = spr.width(), height = spr.height();
@@ -3275,8 +3210,7 @@ void loop() {
 
       rx.setFrequency(currentFrequency);                                   // Set new frequency
 
-      if (currentMode == FM) cleanRdsStationInfo();
-      if (currentMode == FM) cleanRdsMsgInfo();
+      if (currentMode == FM) cleanBfoRdsInfo();
 
       if (isCB()) checkCBChannel();
 
