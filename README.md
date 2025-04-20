@@ -17,7 +17,6 @@ This firmware is for use on the SI4732 (ESP32-S3) Mini/Pocket Receiver
 Changes :
 
 * Added Winamp theme
-* Added Girly theme (to improve)
 * Changed font for Band and MHz text 
 * Added circular stereo/mono logo https://github.com/m2608/ats_mini
 * Adjusted FM frequency limit for Europe
