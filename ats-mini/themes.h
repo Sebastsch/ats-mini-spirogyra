@@ -387,47 +387,6 @@ const ColorTheme theme[] = {
   },
 
 {
-    "Girly",
-    0xFC8E, // bg
-    0xF808, // text
-    0xBAF1, // text_muted
-    0xF800, // text_warn
-    0xF808, // smeter_icon
-    0xF808, // smeter_bar
-    0xB08D, // smeter_bar_plus
-    0xD889, // save_icon
-    0xD889, // batt_voltage
-    0x4083, // batt_border
-    0xE00B, // batt_full
-    0xE000, // batt_low
-    0xC8F1, // batt_charge
-    0xD69A, // batt_icon
-    0xE00B, // Ster_icon
-    0xE00B, // Mono_icon
-    0xE00B, // band_text
-    0xE00B, // mode_text
-    0x4083, // mode_border
-    0xFC8E, // box_bg
-    0xFC8E, // box_border
-    0xF808, // box_text
-    0xFC8E, // box_off_bg
-    0xFFFF, // box_off_text
-    0xFC8E, // menu_bg
-    0x4083, // menu_border
-    0xD69A, // menu_hdr
-    0xC8EB, // menu_item
-    0xFC8E, // menu_hl_bg
-    0xF808, // menu_hl_text
-    0xC8EB, // menu_param
-    0xF808, // freq_text
-    0xF808, // funit_text
-    0xF808, // rds_text
-    0xF808, // scale_text
-    0xC8C2, // scale_pointer
-    0xC9AB, // scale_line
-  },
-
-{
     "Modern",
     0x2A2C, // bg
     0xDEFA, // text
