@@ -2282,7 +2282,7 @@ void drawSprite()
       spr.setTextDatum(TL_DATUM);
       spr.setFreeFont(&PixelOperator8pt7b);
       spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
-      const int max_line_len = 32;
+      const int max_line_len = 34;
       char line1[max_line_len + 1];
       char line2[max_line_len + 1];
       int len = strlen(bufferRdsMsg);
