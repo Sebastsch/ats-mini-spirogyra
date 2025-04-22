@@ -570,8 +570,8 @@ const char *cbChannelNumber[] = {
 char *rdsMsg;
 char *stationName;
 char *rdsTime;
-char bufferStationName[50];
-char bufferRdsMsg[100];
+char bufferStationName[25];
+char bufferRdsMsg[50];
 char bufferRdsTime[32];
 
 uint8_t rssi = 0;
@@ -2282,7 +2282,7 @@ void drawSprite()
       spr.setTextDatum(TL_DATUM);
       spr.setFreeFont(&PixelOperator8pt7b);
       spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
-      const int max_line_len = 30;
+      const int max_line_len = 32;
       char line1[max_line_len + 1];
       char line2[max_line_len + 1];
       int len = strlen(bufferRdsMsg);
