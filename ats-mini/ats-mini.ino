@@ -2271,7 +2271,7 @@ void drawSprite()
       //  spr.fillRect(15 + meter_offset_x, 7+meter_offset_y, 4*17, 2, theme[themeIdx].bg);
       //}
         spr.setTextDatum(MR_DATUM);
-        //spr.fillRect(rds_offset_x, rds_offset_y - 2, 150, 20, theme[themeIdx].bg);
+        spr.fillRect(rds_offset_x, rds_offset_y - 2, 150, 20, theme[themeIdx].bg);
         spr.setFreeFont(&Technology10pt7b);
         spr.setTextColor(theme[themeIdx].rds_text, theme[themeIdx].bg);
         //spr.drawString("*STATION*", rds_offset_x, rds_offset_y);
